@@ -33,6 +33,7 @@ class util(commands.Cog):
             description = '!avatar ([user_name])',
             color       = 0x00ffff,
         )
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True)
     async def __avatar__(self, ctx):
@@ -76,10 +77,8 @@ class util(commands.Cog):
 
     @commands.command(aliases=['role'])
     async def roles(self, ctx):
-        text = ''
-        for i in range(1, len(ctx.author.roles)):
-            text += f'{ctx.author.roles[i].name}  '
-        await ctx.send(text)
+        roles = [x.name for x in ctx.author.roles]
+        await ctx.send(' '.join(roles[1:]))
 
     @commands.command()
     async def prime_factorization(self, ctx, number: int = 758936553):

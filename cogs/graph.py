@@ -1,4 +1,5 @@
 from   discord.ext import commands
+from   discord　   import Embed
 import discord
 
 import matplotlib.pyplot as plt

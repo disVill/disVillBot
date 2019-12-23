@@ -9,11 +9,11 @@ class BotHelp(commands.Cog):
         self.bot = bot
 
 
-    def get_content_list(page):
-        command_list = {
+    def get_content_list(self, page):
+        return command_list = {
             "!google [keyword]": 'googleで検索します',
             "!poll [question] *[choices]": "アンケートを作成します",
-            "!poll_end": "投票を終了します (投票作成者のみ)",
+            "!poll_end": "投票を終了します (投票作成者のみ実行可能)",
             "!nether_gate": "minecraftのオープンワールド座標をネザーの座標に変換します",
             "!menber": "このサーバにいるメンバーの合計数を表示します",
             "!avatar ([user name])": "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します",
@@ -21,7 +21,7 @@ class BotHelp(commands.Cog):
             "!wly": "ワークラボの予約時間を表示します",
             "!janken [hand type]": "BOTとじゃんけんします",
             "!roles": "自分についている役職を確認します",
-            "!echo": "メッセージのオウム返しをします",
+            "!echo ([reverse=false])": "メッセージのオウム返しをします !echo trueで文章を反転します",
         }
 
     @commands.command()

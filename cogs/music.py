@@ -5,6 +5,7 @@ import discord
 
 import asyncio
 import random
+import sys
 import traceback
 from   unicodedata import numeric
 

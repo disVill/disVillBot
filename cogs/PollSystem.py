@@ -4,6 +4,8 @@ import discord
 
 from   unicodedata import numeric
 from   .config     import GuildId
+import sys
+import traceback
 
 ID = GuildId.get_id()
 

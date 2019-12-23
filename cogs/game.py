@@ -10,7 +10,7 @@ class Game(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['ng'])
-    async def nether_gate(ctx, x: int, z: int):
+    async def nether_gate(self, ctx, x: int, z: int):
         x /= 8
         z /= 8
         await ctx.send(f'**x = {x}, z = {z}**')

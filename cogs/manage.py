@@ -66,7 +66,7 @@ class manage(commands.Cog):
                 await ctx.send(fmt.format(type(e).__name__, e))
                 await ctx.send('-' * 30)
 
-                print(f'Failed to reload extension {extension}.', file=sys.stderr)
+                print(f'Failed to reload extension {ext_name}.', file=sys.stderr)
                 traceback.print_exc()
                 print('-' * 30)
 

@@ -1,4 +1,4 @@
 discord.py
 google
-matplotlib
-numpy
+# matplotlib
+# numpy

@@ -16,7 +16,7 @@ def fetch_extensions():
         'cogs.manage',
         'cogs.GoogleSearch',
         'cogs.PollSystem',
-        'cogs.graph',
+        # 'cogs.graph',
         'cogs.game',
         'cogs.BotConfig',
         # 'cogs.music',

@@ -11,17 +11,17 @@ class BotHelp(commands.Cog):
 
     def get_content_list(self, page):
         return command_list = {
+            "!avatar ([user name])": "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します",
+            "!echo": "メッセージのオウム返しをします",
             "!google [keyword]": 'googleで検索します',
+            "!janken [hand type]": "BOTとじゃんけんします",
+            "!menber": "このサーバにいるメンバーの合計数を表示します",
+            "!nether_gate": "minecraftのオープンワールド座標をネザーの座標に変換します",
             "!poll [question] *[choices]": "アンケートを作成します",
             "!poll_end": "投票を終了します (投票作成者のみ実行可能)",
-            "!nether_gate": "minecraftのオープンワールド座標をネザーの座標に変換します",
-            "!menber": "このサーバにいるメンバーの合計数を表示します",
-            "!avatar ([user name])": "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します",
             "!prime_factorization [number]": "素因数分解します",
-            "!wly": "ワークラボの予約時間を表示します",
-            "!janken [hand type]": "BOTとじゃんけんします",
             "!roles": "自分についている役職を確認します",
-            "!echo ([reverse=false])": "メッセージのオウム返しをします !echo trueで文章を反転します",
+            "!wly": "ワークラボの予約時間を表示します",
         }
 
     @commands.command()

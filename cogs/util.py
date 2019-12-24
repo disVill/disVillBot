@@ -100,7 +100,7 @@ class util(commands.Cog):
 
     @commands.command()
     async def echo(self, ctx):
-        await ctx.send(ctx.message.content)
+        await ctx.send(ctx.message.content[6:])
 
 
 def setup(bot):

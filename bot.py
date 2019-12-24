@@ -27,7 +27,6 @@ def fetch_extensions():
 
 
 class disVillBot(commands.Bot):
-
     def __init__(self, command_prefix):
         super().__init__(command_prefix)
 

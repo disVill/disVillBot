@@ -93,6 +93,9 @@ class music(commands.Cog):
     # ボイスチャンネルにBOTを接続する
     @commands.command()
     async def summon(self, ctx):
+        if not discord.opus.is_loaded():
+            discord.opus.load_opus("heroku-buildpack-libopus")
+
         try:
             await ctx.send('ボイスチャンネルへ接続します')
             self.voice = await ctx.author.voice.channel.connect()

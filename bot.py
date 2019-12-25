@@ -28,7 +28,7 @@ def fetch_extensions():
 
 class disVillBot(commands.Bot):
     def __init__(self, command_prefix):
-        super().__init__(command_prefix)
+        super().__init__(command_prefix, help_command=None)
 
     # BOTが起動したときにコグを読み込む
     async def on_ready(self):

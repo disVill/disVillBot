@@ -2,9 +2,9 @@ import os
 
 
 class BotAuth:
-    bot_token      = '' or os.environ.get('TOKEN')
+    bot_token      = 'NjI2NDAzNzAxNDY0MTA0OTk2.XgHlbw.933ZWqDkYN2PxfR84LoTpZAmyrQ' or os.environ.get('TOKEN')
     dammy_token    = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken'
-    command_prefix = '!'
+    command_prefix = '?'
 
 
 class SiteUrls:
@@ -36,6 +36,7 @@ class GuildId:
                 'chat'    : 626401720607703053,
                 'login'   : 626401965315719178,
                 'bot'     : 626401965315719178,
+                'logs'    : 659252702890557450,
                 'info'    : 626681636716675073,
                 'poll'    : 627093469722181642,
                 'member'  : 626402047251578880,

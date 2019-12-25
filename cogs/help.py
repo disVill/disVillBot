@@ -8,9 +8,8 @@ class BotHelp(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
-    def get_content_list(self, page):
-        return command_list = {
+    def get_content_list(self):
+        return {
             "!avatar ([user name])": "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します",
             "!echo": "メッセージのオウム返しをします",
             "!google [keyword]": 'googleで検索します',
@@ -22,10 +21,17 @@ class BotHelp(commands.Cog):
             "!prime_factorization [number]": "素因数分解します",
             "!roles": "自分についている役職を確認します",
             "!wly": "ワークラボの予約時間を表示します",
+            "!summon": "自分の入っているボイスチャンネルにBOTを呼び出します",
+            "!play ([music name])": "曲のリストを表示します. 曲名を指定した場合はその曲を再生します.\n再生中の場合はプレイリストに追加します",
+            "!pause": "曲を一時停止します",
+            "!resume": "曲の再生を再開します",
+            "!stop": "曲の再生を停止します. プレイリストに曲がある場合は次の曲を再生します",
+            "!playlist": "プレイリストに登録されている曲を表示します",
+            "!exit": "BOTを今いるボイスチャンネルから切断します",
         }
 
     @commands.command()
-    async def info(self, ctx):
+    async def help(self, ctx):
         page_count = 0 #ヘルプの現在表示しているページ数
         page_content_list = ["このBOTのコマンド一覧です。\n➡を押すと次のページへ",
             """**google**：　googleで検索します 　例!google 近くの本屋
@@ -80,14 +86,22 @@ class BotHelp(commands.Cog):
 
                 await send_message.clear_reactions() #事前に消去する
                 await send_message.edit(content=page_content_list[page_count])
+                try:
+                    if page_count == 0:
+                        await send_message.add_reaction("➡")
+                    elif page_count >= 3:
+                        await send_message.add_reaction("⬅")
+                    else:
+                        await send_message.add_reaction("⬅")
+                        await send_message.add_reaction("➡")
+                except KeyError:
+                    pass
 
-                if page_count == 0:
-                    await send_message.add_reaction("➡")
-                elif page_count >= 3:
-                    await send_message.add_reaction("⬅")
-                else:
-                    await send_message.add_reaction("⬅")
-                    await send_message.add_reaction("➡")
+    @commands.command(hidden=True)
+    async def last_update(self, ctx):
+        embed = Embed(
+            title=''
+        )
 
 def setup(bot):
     bot.add_cog(BotHelp(bot))

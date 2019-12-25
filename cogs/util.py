@@ -65,6 +65,12 @@ class util(commands.Cog):
     async def topic(self, ctx, channel_topic):
         await ctx.channel.edit(topic=channel_topic)
 
+    @commands.command()
+    async def LUL(self, ctx):
+        emoji = discord.utils.get(ctx.guild.emojis, name='LUL')
+        if emoji:
+            await ctx.add_reaction(emoji)
+
 
     @commands.command()
     @is_developer()

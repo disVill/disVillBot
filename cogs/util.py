@@ -3,6 +3,7 @@ from   discord     import Embed
 import discord
 
 import copy
+import datetime
 
 from .manage       import is_developer
 
@@ -66,11 +67,10 @@ class util(commands.Cog):
         await ctx.channel.edit(topic=channel_topic)
 
     @commands.command()
-    async def LUL(self, ctx):
-        emoji = discord.utils.get(ctx.guild.emojis, name='LUL')
+    async def LUL(self, ctx, emoji_name='umm'):
+        emoji = discord.utils.get(ctx.guild.emojis, name=emoji_name)
         if emoji:
             await ctx.add_reaction(emoji)
-
 
     @commands.command()
     @is_developer()
@@ -79,7 +79,6 @@ class util(commands.Cog):
         category    = ctx.guild.get_channel(category_id)
         await category.create_text_channel(name=arg)
         await ctx.send(f"新しいチャンネル'{arg}'を作りました")
-
 
     @commands.command(aliases=['role'])
     async def roles(self, ctx):
@@ -103,6 +102,10 @@ class util(commands.Cog):
 
         await ctx.send(text)
 
+    @commands.command()
+    async def time(self, ctx):
+        time_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+        await ctx.send(time_now)
 
     @commands.command()
     async def echo(self, ctx):

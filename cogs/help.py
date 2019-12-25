@@ -20,6 +20,7 @@ class BotHelp(commands.Cog):
             "!poll_end": "投票を終了します (投票作成者のみ実行可能)",
             "!prime_factorization [number]": "素因数分解します",
             "!roles": "自分についている役職を確認します",
+            "!time": "日本標準時間を表示します",
             "!wly": "ワークラボの予約時間を表示します",
             "!summon": "自分の入っているボイスチャンネルにBOTを呼び出します",
             "!play ([music name])": "曲のリストを表示します. 曲名を指定した場合はその曲を再生します.\n再生中の場合はプレイリストに追加します",
@@ -30,6 +31,24 @@ class BotHelp(commands.Cog):
             "!exit": "BOTを今いるボイスチャンネルから切断します",
         }
 
+    def get_help_embed(self, page):
+        commands_dic = self.get_content_list()
+        embed = Embed(
+            title=f'コマンド一覧 page{page+1}',
+            color=0x00c0ff
+        )
+        i = 0
+        for command, text in commands_dic.items():
+            if i >= 4*page and i < 4*page+4:
+                embed.add_field(
+                    name=command,
+                    value=text,
+                    inline=False,
+                )
+            i += 1
+        return embed
+
+
     @commands.command()
     async def help(self, ctx):
         page_count = 0 #ヘルプの現在表示しているページ数
@@ -38,7 +57,7 @@ class BotHelp(commands.Cog):
 **nether_gate [x] [z]**：　minecraftのオープンワールド座標をネザーの座標に変換します
 **poll [question] *[Choices]**：　アンケートを作成します
 **poll_end**：　投票を終了します 投票を作った人のみ終了できます
-**graph *[option]**：　グラフを作成します 　例!graph liner 0 10 -2
+**graph *[options]**：　グラフを作成します 　例!graph liner 0 10 -2
 **member**：　このサーバにいるメンバーの合計数を表示します
 **avatar ([user name])：　
 **info**：　この一覧を表示します""",
@@ -56,7 +75,7 @@ class BotHelp(commands.Cog):
 **exit**：　BOTをボイスチャンネルから切断""",
             ] #ヘルプの各ページ内容
 
-        send_message = await ctx.send(page_content_list[0]) #最初のページ投稿
+        send_message = await ctx.send(embed=self.get_help_embed(0)) #最初のページ投稿
         await send_message.add_reaction("➡")
 
         def help_react_check(reaction,user):
@@ -74,22 +93,23 @@ class BotHelp(commands.Cog):
 
         while not self.bot.is_closed():
             try:
-                reaction, user = await self.bot.wait_for('reaction_add',check=help_react_check, timeout=None)
+                reaction, user = await self.bot.wait_for('reaction_add',check=help_react_check, timeout=180)
             except:
+                await send_message.clear_reactions()
                 return #時間制限が来たら、それ以降は処理しない
             else:
                 emoji = str(reaction.emoji)
-                if emoji == "➡" and page_count < 3:
+                if emoji == "➡" and page_count < 5:
                     page_count += 1
                 if emoji == "⬅" and page_count > 0:
                     page_count -= 1
 
                 await send_message.clear_reactions() #事前に消去する
-                await send_message.edit(content=page_content_list[page_count])
+                await send_message.edit(embed=self.get_help_embed(page_count))
                 try:
                     if page_count == 0:
                         await send_message.add_reaction("➡")
-                    elif page_count >= 3:
+                    elif page_count >= 5:
                         await send_message.add_reaction("⬅")
                     else:
                         await send_message.add_reaction("⬅")

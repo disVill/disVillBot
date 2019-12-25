@@ -19,10 +19,11 @@ def fetch_extensions():
         # 'cogs.graph',
         'cogs.game',
         'cogs.BotConfig',
-        # 'cogs.music',
+        'cogs.music',
         'cogs.help',
         'cogs.util',
         'cogs.wly',
+        'cogs.event',
     )
 
 

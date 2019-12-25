@@ -99,7 +99,7 @@ class BotHelp(commands.Cog):
                 return #時間制限が来たら、それ以降は処理しない
             else:
                 emoji = str(reaction.emoji)
-                if emoji == "➡" and page_count < 5:
+                if emoji == "➡" and page_count < 4:
                     page_count += 1
                 if emoji == "⬅" and page_count > 0:
                     page_count -= 1
@@ -109,7 +109,7 @@ class BotHelp(commands.Cog):
                 try:
                     if page_count == 0:
                         await send_message.add_reaction("➡")
-                    elif page_count >= 5:
+                    elif page_count >= 4:
                         await send_message.add_reaction("⬅")
                     else:
                         await send_message.add_reaction("⬅")

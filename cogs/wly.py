@@ -7,7 +7,7 @@ from   .config     import SiteUrls
 
 class WlyBook:
     def __init__(self):
-        pass
+        ...
 
     def get_wly_book():
         wly_book_list = [
@@ -45,7 +45,6 @@ class WorkLabYatsugatake(commands.Cog):
         if ctx.invoked_subcommand is None:
             embed = WlyBook.book_list_embed()
             await ctx.send(embed = embed)
-
 
     @wly.group()
     async def site(self, ctx):

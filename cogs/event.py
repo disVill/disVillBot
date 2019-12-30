@@ -28,8 +28,11 @@ class event(commands.Cog):
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.author.send('このコマンドはDMで使用できません')
 
-        elif isinstance(error, (commands.DisabledCommand, commands.CommandNotFound)):
-            await ctx.send('このコマンドは無効になっているか存在しません')
+        elif isinstance(error, commands.DisabledCommand):
+            await ctx.send('このコマンドは現在無効になっています')
+
+        elif isinstance(error, commands.CommandNotFound):
+            await ctx.send(f'コマンド {ctx.message.content.split()[0]} は存在しません')
 
         elif isinstance(error, commands.CommandInvokeError):
             original = error.original
@@ -61,7 +64,7 @@ class event(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        await self.logs_channel.send(f'**Menber removed**:{member}')
+        await self.logs_channel.send(f'**Removed menber**\n{member}')
 
 def setup(bot):
     bot.add_cog(event(bot))

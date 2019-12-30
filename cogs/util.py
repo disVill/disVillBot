@@ -2,8 +2,11 @@ from   discord.ext import commands
 from   discord     import Embed
 import discord
 
+import asyncio
 import copy
 import datetime
+import re
+import time
 
 from .manage       import is_developer
 
@@ -11,7 +14,6 @@ from .manage       import is_developer
 class util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.group()
     async def avatar(self, ctx, who: discord.User = None):
@@ -47,19 +49,16 @@ class util(commands.Cog):
 
         await ctx.send(embed=embed)
 
-
     @commands.command()
     async def member(self, ctx):
         arg  = ctx.guild.member_count
         text = f'このサーバーには{arg}人のメンバーがいます'
         await ctx.send(text)
 
-
     @commands.command()
     @is_developer()
     async def name(self, ctx, channel_name):
         await ctx.channel.edit(name=channel_name)
-
 
     @commands.command()
     @is_developer()
@@ -67,10 +66,14 @@ class util(commands.Cog):
         await ctx.channel.edit(topic=channel_topic)
 
     @commands.command()
-    async def LUL(self, ctx, emoji_name='umm'):
-        emoji = discord.utils.get(ctx.guild.emojis, name=emoji_name)
-        if emoji:
-            await ctx.add_reaction(emoji)
+    async def emoji(self, ctx, *emoji_names):
+        if not emoji_names:
+            await ctx.send('Custom Emojiの名前を入力してください')
+
+        for emoji_name in emoji_names:
+            emoji = discord.utils.get(ctx.guild.emojis, name=emoji_name)
+            if emoji:
+                await ctx.message.add_reaction(emoji)
 
     @commands.command()
     @is_developer()
@@ -85,9 +88,13 @@ class util(commands.Cog):
         roles = [x.name for x in ctx.author.roles]
         await ctx.send(' '.join(roles[1:]))
 
-    @commands.command()
-    async def prime_factorization(self, ctx, number: int = 758936553):
-        text = ''
+    @commands.command(aliases=['pf'], enabled=False)
+    async def prime_factorization(self, ctx, number: int):
+        if number is None or number > 65535 or number < 0:
+            await ctx.send('無効な数字です')
+            return
+        await ctx.send(f'{number}を素因数分解します')
+        text = ' '
 
         while number % 2 == 0:
             text += '2 '
@@ -98,9 +105,36 @@ class util(commands.Cog):
                 text += f'{i} '
                 number /= i
 
-        # if i > 1: text += f'{i}'
+        if i > 1: text += f'{i}'
 
         await ctx.send(text)
+
+    @commands.command()
+    async def timer(self, ctx, *args):
+        times = re.findall(r'\d+', ctx.message.content)
+        units = re.findall(r'[h,m,s]', ctx.message.content[6:])
+
+        if len(times) != len(units) or not len(args):
+            await ctx.send('時間指定の方法が誤っています')
+
+        seconds = 0
+        text = ''
+
+        if times and units:
+            for t, u in zip(times, units):
+                if u == 'h':
+                    seconds += 3600 * int(t)
+                    text += f'{t}時間'
+                elif u == 'm':
+                    seconds += 60 * int(t)
+                    text += f'{t}分'
+                elif u == 's':
+                    seconds += int(t)
+                    text += f'{t}秒'
+
+        await ctx.send(f'タイマーを{text}に設定しました:timer:')
+        await asyncio.sleep(seconds)
+        await ctx.send(f'{ctx.author.mention} 設定された時間が経過しました:timer:')
 
     @commands.command()
     async def time(self, ctx):

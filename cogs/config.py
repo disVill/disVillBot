@@ -2,7 +2,7 @@ import os
 
 
 class BotAuth:
-    bot_token      = 'NjI2NDAzNzAxNDY0MTA0OTk2.Xgnilw.Y2baKlUwqUFMS0WkKJHlA6HH1VE' or os.environ.get('TOKEN')
+    bot_token      = '' or os.environ.get('TOKEN')
     dammy_token    = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken'
     command_prefix = '?'
 

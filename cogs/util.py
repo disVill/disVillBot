@@ -116,6 +116,7 @@ class util(commands.Cog):
 
         if len(times) != len(units) or not len(args):
             await ctx.send('時間指定の方法が誤っています')
+            return
 
         seconds = 0
         text = ''
@@ -124,17 +125,25 @@ class util(commands.Cog):
             for t, u in zip(times, units):
                 if u == 'h':
                     seconds += 3600 * int(t)
-                    text += f'{t}時間'
                 elif u == 'm':
                     seconds += 60 * int(t)
-                    text += f'{t}分'
                 elif u == 's':
                     seconds += int(t)
-                    text += f'{t}秒'
+
+        if times > 65535:
+            await ctx.send('時間が長すぎます')
+            return
+
+        if seconds // 3600:
+            text += f'{seconds//3600}時間'
+        if seconds % 3600 // 60:
+            text += f'{seconds%3600//60}分'
+        if seconds % 3600 % 60:
+            text += f'{seconds%3600%60}秒'
 
         await ctx.send(f'タイマーを{text}に設定しました:timer:')
-        await asyncio.sleep(seconds)
-        await ctx.send(f'{ctx.author.mention} 設定された時間が経過しました:timer:')
+        # await asyncio.sleep(seconds)
+        await ctx.send(f'{ctx.author.mention} {text}が経過しました:timer:')
 
     @commands.command()
     async def time(self, ctx):

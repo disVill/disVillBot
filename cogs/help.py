@@ -26,7 +26,7 @@ class BotHelp(commands.Cog):
             "~~!prime_factorization [number]  or  !pf [number]~~": "~~素因数分解します 0 ≤ number ≤ 65535~~ ",
             "!roles": "自分についている役職を確認します",
             "!time": "日本標準時間を表示します",
-            "!timer [time]": "タイマーを設定します. 時間は00h00m00sのように数字の後に単位をつけてください",
+            "!timer [time]": "タイマーを設定します",
             "!wly": "ワークラボの予約時間を表示します",
             "~~!summon~~": "~~自分の入っているボイスチャンネルにBOTを呼び出します~~",
             "~~!play ([music name])~~": "~~曲のリストを表示します. 曲名を指定した場合はその曲を再生します.~~\n~~再生中の場合はプレイリストに追加します~~",
@@ -105,13 +105,14 @@ class BotHelp(commands.Cog):
                 except KeyError:
                     pass
 
-    @commands.command(hidden=True)
+    @commands.command()
     async def what_is_new(self, ctx):
         embed = Embed(
-            title='BOTの更新'
-            description='!timerコマンド, !emojiコマンドの追加\nhelpの内容更新, 一部コマンドの無効化'
-            color=0x00ffff
+            title='BOTの更新',
+            description='・!timerコマンド, !emojiコマンドの追加\n・helpの内容更新\n・一部コマンドの無効化',
+            color=0x00ffff,
         )
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(BotHelp(bot))

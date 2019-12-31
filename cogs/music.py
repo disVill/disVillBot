@@ -91,7 +91,7 @@ class music(commands.Cog):
 
 
     # ボイスチャンネルにBOTを接続する
-    @commands.command()
+    @commands.command(enabled=False)
     async def summon(self, ctx):
         if not discord.opus.is_loaded():
             discord.opus.load_opus("heroku-buildpack-libopus")
@@ -110,7 +110,7 @@ class music(commands.Cog):
 
 
     # 曲を再生するコマンド
-    @commands.command()
+    @commands.command(enabled=False)
     async def play(self, ctx, *music_name):
         author  = ctx.author.id
         channel = ctx.channel
@@ -159,7 +159,7 @@ class music(commands.Cog):
 
 
     # 曲の一時停止
-    @commands.command()
+    @commands.command(enabled=False)
     async def pause(self, ctx):
         if self.voice.is_playing():
             self.voice.pause()
@@ -168,7 +168,7 @@ class music(commands.Cog):
 
 
     # 曲の一時停止を解除
-    @commands.command()
+    @commands.command(enabled=False)
     async def resume(self, ctx):
         if self.voice.is_paused():
             self.voice.resume()
@@ -177,7 +177,7 @@ class music(commands.Cog):
 
 
     # 再生されている曲の名前確認
-    @commands.command()
+    @commands.command(enabled=False)
     async def playing(self, ctx):
         if self.voice.is_playing:
             await ctx.send(f"'{self.playing_music}' が再生されています")
@@ -186,7 +186,7 @@ class music(commands.Cog):
 
 
     # プレイリストの次の曲を再生
-    @commands.command()
+    @commands.command(enabled=False)
     async def stop(self, ctx):
         if self.voice.is_playing():
             self.voice.stop()
@@ -195,7 +195,7 @@ class music(commands.Cog):
 
 
     # プレイリストの曲の確認
-    @commands.command()
+    @commands.command(enabled=False)
     async def playlist(self, ctx):
         song_list = ''
 
@@ -209,14 +209,14 @@ class music(commands.Cog):
 
 
     # ボイスチャンネルからBOTを退出
-    @commands.command()
+    @commands.command(enabled=False)
     async def exit(self, ctx):
         await ctx.send('ボイスチャンネルから切断します')
         await self.voice.disconnect()
 
 
     # eval
-    @commands.command(name='eval_m')
+    @commands.command(name='eval_m', enabled=False)
     @is_developer()
     async def evaluation_music(self, ctx, *args):
         x = eval(str(' '.join(args)))
@@ -224,7 +224,7 @@ class music(commands.Cog):
 
 
     # exec
-    @commands.command(name='exec_m')
+    @commands.command(name='exec_m', enabled=False)
     @is_developer()
     async def execution_music(self, ctx, *args):
         exec(str(' '.join(args)))

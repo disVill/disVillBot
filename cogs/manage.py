@@ -1,16 +1,19 @@
-from   discord.ext  import commands
-from   discord      import Embed
+from   discord.ext import commands
+from   discord     import Embed
 import discord
 
-from   unicodedata  import numeric
+from   unicodedata import numeric
+from   contextlib  import redirect_stdout
 import asyncio
 import copy
+import io
 import sys
+import textwrap
 import traceback
 
-from   bot          import fetch_extensions
-from   .PollSystem  import get_numbers
-from   .config      import GuildId
+from   bot         import fetch_extensions
+from   .PollSystem import get_numbers
+from   .config     import GuildId
 
 ID = GuildId.get_id()
 
@@ -35,6 +38,7 @@ class manage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel_member = self.bot.get_channel(id=ID['channel']['member'])
+        self._last_result = None
 
 
     def choice_extension(self):
@@ -77,6 +81,13 @@ class manage(commands.Cog):
         await ctx.send('All finished')
         await ctx.send('-' * 30)
 
+    def cleanup_code(self, content):
+        # remove ```py\n```
+        if content.startswith('```') and content.endswith('```'):
+            return '\n'.join(content.split('\n')[1:-1])
+
+        # remove `foo`
+        return content.strip('` \n')
 
     @commands.command()
     @is_developer()
@@ -125,12 +136,55 @@ class manage(commands.Cog):
 
 
     # eval
-    @commands.command(name='eval')
+    @commands.command(name='_eval')
     @is_developer()
     async def evaluation(self, ctx, *args):
         x = eval(str(' '.join(args)))
         await ctx.send(x)
 
+
+    @commands.command(pass_context=True, hidden=True, name='eval')
+    async def _eval(self, ctx, *, body: str):
+        """Evaluates a code"""
+
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'channel': ctx.channel,
+            'author': ctx.author,
+            'guild': ctx.guild,
+            'message': ctx.message,
+            '_': self._last_result
+        }
+
+        env.update(globals())
+
+        body = self.cleanup_code(body)
+        stdout = io.StringIO()
+
+        to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+
+        try:
+            exec(to_compile, env)
+        except Exception as e:
+            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+
+        func = env['func']
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception as e:
+            value = stdout.getvalue()
+            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+        else:
+            value = stdout.getvalue()
+
+            if ret is None:
+                if value:
+                    await ctx.send(f'```py\n{value}\n```')
+            else:
+                self._last_result = ret
+                await ctx.send(f'```py\n{value}{ret}\n```')
 
     # exec
     @commands.command(name='exec')

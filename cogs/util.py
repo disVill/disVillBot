@@ -2,11 +2,15 @@ from   discord.ext import commands
 from   discord     import Embed
 import discord
 
+from   contextlib  import redirect_stdout
 import asyncio
 import copy
 import datetime
+import io
 import re
+import textwrap
 import time
+import traceback
 
 from .manage       import is_developer
 
@@ -14,6 +18,15 @@ from .manage       import is_developer
 class util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self._last_result = None
+
+    def cleanup_code(self, content):
+        # remove ```py\n```
+        if content.startswith('```') and content.endswith('```'):
+            return '\n'.join(content.split('\n')[1:-1])
+
+        # remove `foo`
+        return content.strip('` \n')
 
     @commands.group()
     async def avatar(self, ctx, who: discord.User = None):
@@ -130,7 +143,7 @@ class util(commands.Cog):
                 elif u == 's':
                     seconds += int(t)
 
-        if times > 65535:
+        if seconds > 65535:
             await ctx.send('時間が長すぎます')
             return
 
@@ -142,7 +155,7 @@ class util(commands.Cog):
             text += f'{seconds%3600%60}秒'
 
         await ctx.send(f'タイマーを{text}に設定しました:timer:')
-        # await asyncio.sleep(seconds)
+        await asyncio.sleep(seconds)
         await ctx.send(f'{ctx.author.mention} {text}が経過しました:timer:')
 
     @commands.command()
@@ -153,6 +166,50 @@ class util(commands.Cog):
     @commands.command()
     async def echo(self, ctx):
         await ctx.send(ctx.message.content[6:])
+
+    @commands.command(pass_context=True, hidden=True, name='eval')
+    async def _eval(self, ctx, *, body: str):
+        env = {
+            # 'ctx': ctx,
+            # 'channel': ctx.channel,
+            # 'author': ctx.author,
+            # 'guild': ctx.guild,
+            # 'message': ctx.message,
+            '_': self._last_result
+        }
+
+        env.update(globals())
+
+        body = self.cleanup_code(body)
+        stdout = io.StringIO()
+
+        to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+
+        try:
+            exec(to_compile, {'__builtins__':{
+                'print':print,'abs':abs,'bool':bool,'dict':dict,'dir':dir,'divmod':divmod,'format':format,'enumarate':enumerate,
+                'float':float,'getattr':getattr,'hasattr':hasattr,'hex':hex,'int':int,'len':len,'list':list,'map':map,'max':max,
+                'min':min,'pow':pow,'range':range,'reversed':reversed,'round':round,'set':set,'setattr':setattr,'slice':slice,
+                'sorted':sorted,'str':str,'sum':sum,'tuple':tuple,'type':type,'zip':zip,'_':self._last_result}}, env)
+        except Exception as e:
+            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+
+        func = env['func']
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception as e:
+            value = stdout.getvalue()
+            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+        else:
+            value = stdout.getvalue()
+
+            if ret is None:
+                if value:
+                    await ctx.send(f'```py\n{value}\n```')
+            else:
+                self._last_result = ret
+                await ctx.send(f'```py\n{value}{ret}\n```')
 
 
 def setup(bot):

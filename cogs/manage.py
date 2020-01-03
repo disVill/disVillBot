@@ -3,12 +3,9 @@ from   discord     import Embed
 import discord
 
 from   unicodedata import numeric
-from   contextlib  import redirect_stdout
 import asyncio
 import copy
-import io
 import sys
-import textwrap
 import traceback
 
 from   bot         import fetch_extensions
@@ -22,11 +19,9 @@ def is_developer():
     async def predicate(ctx):
         if ctx.author.id == ID['user']['develop']:
             return True
-
         else:
             await ctx.send("実行する権限がありません")
             return False
-
     return commands.check(predicate)
 
 
@@ -38,8 +33,6 @@ class manage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel_member = self.bot.get_channel(id=ID['channel']['member'])
-        self._last_result = None
-
 
     def choice_extension(self):
         list_text  = ""
@@ -58,7 +51,6 @@ class manage(commands.Cog):
 
         return embed
 
-
     async def reload_extensions(self, ctx, ext_list):
         await ctx.send('-' * 30)
         for ext_name in ext_list:
@@ -75,19 +67,11 @@ class manage(commands.Cog):
                 print('-' * 30)
 
             else:
-                await ctx.send(f"reload extension '{ext_name}' with no errors")
+                await ctx.send(f"'{ext_name}' をリロードしました")
                 await ctx.send('-' * 30)
 
-        await ctx.send('All finished')
+        await ctx.send('すべてのリロードが完了しました')
         await ctx.send('-' * 30)
-
-    def cleanup_code(self, content):
-        # remove ```py\n```
-        if content.startswith('```') and content.endswith('```'):
-            return '\n'.join(content.split('\n')[1:-1])
-
-        # remove `foo`
-        return content.strip('` \n')
 
     @commands.command()
     @is_developer()
@@ -125,11 +109,12 @@ class manage(commands.Cog):
         if new_member.bot:
             return
         else:
-            new_member_role = select_roll(new_member.guild.roles, name='member')
+            new_member_role = discord.utils.find(lambda role: role.name == 'member', new_member.guild.roles)
             member_num      = new_member.guild.member_count
             mention         = new_member.mention
 
-            await new_member.add_roles(new_member_role)
+            if new_member_role is not None:
+                await new_member.add_roles(new_member_role)
             await self.channel_member.send(
                 f'{mention}Suwarikaサーバへようこそ\nあなたは{member_num}人目のメンバーです'
             )
@@ -142,56 +127,11 @@ class manage(commands.Cog):
         x = eval(str(' '.join(args)))
         await ctx.send(x)
 
-
-    @commands.command(pass_context=True, hidden=True, name='eval')
-    async def _eval(self, ctx, *, body: str):
-        """Evaluates a code"""
-
-        env = {
-            'bot': self.bot,
-            'ctx': ctx,
-            'channel': ctx.channel,
-            'author': ctx.author,
-            'guild': ctx.guild,
-            'message': ctx.message,
-            '_': self._last_result
-        }
-
-        env.update(globals())
-
-        body = self.cleanup_code(body)
-        stdout = io.StringIO()
-
-        to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
-
-        try:
-            exec(to_compile, env)
-        except Exception as e:
-            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
-
-        func = env['func']
-        try:
-            with redirect_stdout(stdout):
-                ret = await func()
-        except Exception as e:
-            value = stdout.getvalue()
-            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
-        else:
-            value = stdout.getvalue()
-
-            if ret is None:
-                if value:
-                    await ctx.send(f'```py\n{value}\n```')
-            else:
-                self._last_result = ret
-                await ctx.send(f'```py\n{value}{ret}\n```')
-
     # exec
     @commands.command(name='exec')
     @is_developer()
     async def execution(self, ctx, *args):
         exec(str(' '.join(args)))
-
 
     # コマンドを別のユーザとして実行
     @commands.command(hidden=True)

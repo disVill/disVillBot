@@ -16,12 +16,13 @@ class BotHelp(commands.Cog):
         return {
             "!avatar ([user name])": "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します",
             "!echo *[message]": "メッセージのオウム返しをします",
-            "!emoji *[Custom Emoji's name]": "BOTが指定したカスタム絵文字をリアクションします",
-            "!google [keyword]": 'googleで検索します',
+            "!emoji *[Custom-Emoji's name]": "BOTが指定したカスタム絵文字をリアクションします",
+            "!eval *[python code]": "簡単なPythonのコードを実行します\n一部の組み込み関数のみ使用可能です",
+            "!google *[keyword]": 'googleで検索します',
             "!janken [hand type]": "BOTとじゃんけんします",
             "!menber": "このサーバにいるメンバーの合計数を表示します",
             "!nether_gate [x] [z]  or  !ng [x] [z]": "minecraftのオープンワールド座標をネザーの座標に変換します",
-            "!poll [question] *[choices]": "アンケートを作成します",
+            "!poll [question] *[choices] lt 10": "アンケートを作成します",
             "!poll_end  or  !pe": "投票を終了します (投票作成者のみ実行可能)",
             "~~!prime_factorization [number]  or  !pf [number]~~": "~~素因数分解します 0 ≤ number ≤ 65535~~ ",
             "!roles": "自分についている役職を確認します",
@@ -108,8 +109,7 @@ class BotHelp(commands.Cog):
     @commands.command()
     async def what_is_new(self, ctx):
         embed = Embed(
-            title='BOTの更新',
-            description='・!timerコマンド, !emojiコマンドの追加\n・helpの内容更新\n・一部コマンドの無効化',
+            description='BOTの更新 v1.2.2\n・!eval コマンドの追加\n・バグ修正',
             color=0x00ffff,
         )
         await ctx.send(embed=embed)

@@ -15,6 +15,7 @@ from   .manage     import is_developer
 # bot.pyと同じディレクトリにある時はいらない
 # ffmpeg_path = r"C:\your\path\ffmpeg.exe"
 
+is_enabled = True
 
 # ドキドキ文芸部のサントラ 曲名
 def music_list():
@@ -32,8 +33,8 @@ def music_list():
         'Just Monika.',
         'I Still Love You',
         'Your Reality (Credits)',
-        'Poems Are Forever (Bonus Track)',
-        'Doki Doki (Bonus Track)',
+        # 'Poems Are Forever (Bonus Track)',
+        # 'Doki Doki (Bonus Track)',
     ]
 
 
@@ -91,7 +92,7 @@ class music(commands.Cog):
 
 
     # ボイスチャンネルにBOTを接続する
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def summon(self, ctx):
         if not discord.opus.is_loaded():
             discord.opus.load_opus("heroku-buildpack-libopus")
@@ -101,7 +102,7 @@ class music(commands.Cog):
             self.voice = await ctx.author.voice.channel.connect()
 
         except Exception as e:
-            fmt = 'エラー　ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
+            fmt = 'エラー ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
             await ctx.send(fmt.format(type(e).__name__, e))
             print(f'Failed to connect voic3 channel', file=sys.stderr)
             traceback.print_exc()
@@ -110,7 +111,7 @@ class music(commands.Cog):
 
 
     # 曲を再生するコマンド
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def play(self, ctx, *music_name):
         author  = ctx.author.id
         channel = ctx.channel
@@ -159,7 +160,7 @@ class music(commands.Cog):
 
 
     # 曲の一時停止
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def pause(self, ctx):
         if self.voice.is_playing():
             self.voice.pause()
@@ -168,7 +169,7 @@ class music(commands.Cog):
 
 
     # 曲の一時停止を解除
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def resume(self, ctx):
         if self.voice.is_paused():
             self.voice.resume()
@@ -177,7 +178,7 @@ class music(commands.Cog):
 
 
     # 再生されている曲の名前確認
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def playing(self, ctx):
         if self.voice.is_playing:
             await ctx.send(f"'{self.playing_music}' が再生されています")
@@ -186,7 +187,7 @@ class music(commands.Cog):
 
 
     # プレイリストの次の曲を再生
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def stop(self, ctx):
         if self.voice.is_playing():
             self.voice.stop()
@@ -195,7 +196,7 @@ class music(commands.Cog):
 
 
     # プレイリストの曲の確認
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def playlist(self, ctx):
         song_list = ''
 
@@ -209,14 +210,14 @@ class music(commands.Cog):
 
 
     # ボイスチャンネルからBOTを退出
-    @commands.command(enabled=False)
+    @commands.command(enabled=is_enabled)
     async def exit(self, ctx):
         await ctx.send('ボイスチャンネルから切断します')
         await self.voice.disconnect()
 
 
     # eval
-    @commands.command(name='eval_m', enabled=False)
+    @commands.command(name='eval_m', enabled=is_enabled)
     @is_developer()
     async def evaluation_music(self, ctx, *args):
         x = eval(str(' '.join(args)))
@@ -224,7 +225,7 @@ class music(commands.Cog):
 
 
     # exec
-    @commands.command(name='exec_m', enabled=False)
+    @commands.command(name='exec_m', enabled=is_enabled)
     @is_developer()
     async def execution_music(self, ctx, *args):
         exec(str(' '.join(args)))

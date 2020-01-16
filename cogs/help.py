@@ -29,13 +29,13 @@ class BotHelp(commands.Cog):
             "!time": "日本標準時間を表示します",
             "!timer [time]": "タイマーを設定します",
             "!wly": "ワークラボの予約時間を表示します",
-            "~~!summon~~": "~~自分の入っているボイスチャンネルにBOTを呼び出します~~",
-            "~~!play ([music name])~~": "~~曲のリストを表示します. 曲名を指定した場合はその曲を再生します.~~\n~~再生中の場合はプレイリストに追加します~~",
-            "~~!pause~~": "~~曲を一時停止します~~",
-            "~~!resume~~": "~~曲の再生を再開します~~",
-            "~~!stop~~": "~~曲の再生を停止します. プレイリストに曲がある場合は次の曲を再生します~~",
-            "~~!playlist~~": "~~プレイリストに登録されている曲を表示します~~",
-            "~~!exit~~": "~~BOTを今いるボイスチャンネルから切断します~~",
+            "!summon": "自分の入っているボイスチャンネルにBOTを呼び出します",
+            "!play ([music name])": "曲のリストを表示します. 曲名を指定した場合はその曲を再生します.\n再生中の場合はプレイリストに追加します",
+            "!pause": "曲を一時停止します",
+            "!resume": "曲の再生を再開します",
+            "!stop": "曲の再生を停止します. プレイリストに曲がある場合は次の曲を再生します",
+            "!playlist": "プレイリストに登録されている曲を表示します",
+            "!exit": "BOTを今いるボイスチャンネルから切断します",
         }
 
     def get_help_embed(self, page):
@@ -109,7 +109,7 @@ class BotHelp(commands.Cog):
     @commands.command()
     async def what_is_new(self, ctx):
         embed = Embed(
-            description='BOTの更新 v1.2.2\n・!eval コマンドの追加\n・バグ修正',
+            description='BOTの更新 v1.2.3\n・音楽再生機能の追加 \n・曲は今のところDDLCのサントラだけ',
             color=0x00ffff,
         )
         await ctx.send(embed=embed)

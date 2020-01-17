@@ -20,8 +20,15 @@ class event(commands.Cog):
         if msg.author.bot:
             return
         else:
-            time_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-            await self.logs_channel.send(f"**Send message**\n{msg.author}: {msg.channel}: {time_now}\n{msg.content}")
+            embed = Embed(
+                title = 'Send message',
+                color = 0x98eb34,
+                description=f'{msg.content}',
+                timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+            )
+            embed.set_author(name=msg.author, icon_url=msg.author.avatar_url)
+            embed.set_footer(text=msg.channel.name, icon_url=msg.guild.icon_url)
+            await self.logs_channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -59,8 +66,16 @@ class event(commands.Cog):
         if b.author.bot:
             return
         else:
-            time_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-            await self.logs_channel.send(f"**Edit message**\n{b.author}: {b.channel}: {time_now}\n{b.content}\nto\n{a.content}")
+            embed = Embed(
+                title = 'Edit message',
+                color = 0x34abeb,
+                timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+            )
+            embed.add_field(name='before',value=b.content)
+            embed.add_field(name='after',value=a.content)
+            embed.set_author(name=a.author, icon_url=a.author.avatar_url)
+            embed.set_footer(text=a.channel.name, icon_url=a.guild.icon_url)
+            await self.logs_channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):

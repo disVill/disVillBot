@@ -16,6 +16,7 @@ ID = GuildId.get_id()
 
 
 def is_developer():
+    """コマンドの実行者が開発者か確認する"""
     async def predicate(ctx):
         if ctx.author.id == ID['user']['develop']:
             return True

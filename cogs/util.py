@@ -7,6 +7,7 @@ import asyncio
 import copy
 import datetime
 import io
+import random
 import re
 import textwrap
 import time
@@ -90,10 +91,10 @@ class util(commands.Cog):
 
     @commands.command()
     @is_developer()
-    async def make_ch(self, ctx, arg):
+    async def make_ch(self, ctx, *args):
         category_id = ctx.channel.category_id
         category    = ctx.guild.get_channel(category_id)
-        await category.create_text_channel(name=arg)
+        await category.create_text_channel(name=' '.join(args))
         await ctx.send(f"新しいチャンネル'{arg}'を作りました")
 
     @commands.command(aliases=['role'])
@@ -167,6 +168,10 @@ class util(commands.Cog):
     async def echo(self, ctx):
         await ctx.send(ctx.message.content[6:])
 
+    @commands.command()
+    async def ping(self, ctx):
+        await ctx.send(self.bot.latency * 1000, '[ms]')
+
     @commands.command(pass_context=True, hidden=True, name='eval')
     async def _eval(self, ctx, *, body: str):
         env = {
@@ -188,9 +193,9 @@ class util(commands.Cog):
         try:
             exec(to_compile, {'__builtins__':{
                 'print':print,'abs':abs,'bool':bool,'dict':dict,'dir':dir,'divmod':divmod,'format':format,'enumarate':enumerate,
-                'float':float,'getattr':getattr,'hasattr':hasattr,'hex':hex,'int':int,'len':len,'list':list,'map':map,'max':max,
-                'min':min,'pow':pow,'range':range,'reversed':reversed,'round':round,'set':set,'setattr':setattr,'slice':slice,
-                'sorted':sorted,'str':str,'sum':sum,'tuple':tuple,'type':type,'zip':zip,'_':self._last_result}}, env)
+                'float':float,'getattr':getattr,'hasattr':hasattr,'hex':hex,'int':int,'input':input,'len':len,'list':list,'map':map,
+                'max':max,'min':min,'pow':pow,'random':random,'range':range,'reversed':reversed,'round':round,'set':set,'setattr':setattr,
+                'slice':slice,'sorted':sorted,'str':str,'sum':sum,'time':time,'tuple':tuple,'type':type,'zip':zip,'_':self._last_result}}, env)
         except Exception as e:
             return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
 

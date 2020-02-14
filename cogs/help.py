@@ -43,7 +43,7 @@ class BotHelp(commands.Cog):
         commands_dic = self.get_content_list()
 
         embed = Embed(
-            title=f'コマンド一覧 page {page}, {len(command_dic)} commands',
+            title=f'コマンド一覧 page {page}, {len(commands_dic)} commands',
             color=0x00c0ff
         )
         i = 0

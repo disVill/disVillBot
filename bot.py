@@ -22,7 +22,7 @@ def fetch_extensions():
         'cogs.help',
         'cogs.util',
         'cogs.wly',
-        # 'cogs.event',
+        'cogs.event',
     )
 
 class disVillBot(commands.Bot):

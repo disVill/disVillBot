@@ -9,7 +9,6 @@ from cogs.config import GuildId
 config_instance = GuildId()
 (TOKEN, prefix) = config_instance.get_token_and_prefix()
 
-
 # cog list
 def fetch_extensions():
     return (
@@ -23,9 +22,8 @@ def fetch_extensions():
         'cogs.help',
         'cogs.util',
         'cogs.wly',
-        'cogs.event',
+        # 'cogs.event',
     )
-
 
 class disVillBot(commands.Bot):
     def __init__(self, command_prefix):
@@ -50,7 +48,6 @@ class disVillBot(commands.Bot):
             else:
                 print('finished (no error)')
                 print('-----')
-
 
 if __name__ == '__main__':
     bot = disVillBot(command_prefix=prefix)

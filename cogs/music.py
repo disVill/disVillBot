@@ -37,10 +37,8 @@ def music_list():
         # 'Doki Doki (Bonus Track)',
     ]
 
-
 class music(commands.Cog):
-    """mp3の音楽再生機能
-    """
+    """mp3の音楽再生機能"""
 
     def __init__(self, bot):
         self.bot          = bot
@@ -48,7 +46,6 @@ class music(commands.Cog):
         self.play_next    = asyncio.Event()
         self.songs        = asyncio.Queue()
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-
 
     # 曲リストから埋め込みメッセージ作成
     def music_list_embed(self):
@@ -71,11 +68,9 @@ class music(commands.Cog):
 
         return embed
 
-
     def toggle_next(self, error):
         self.bot.loop.call_soon_threadsafe(self.play_next.set)
         print('error check:' + error)
-
 
     # songsキューに入れた曲リストを一つづつ取り出して再生
     async def audio_player_task(self):
@@ -89,7 +84,6 @@ class music(commands.Cog):
             # executable=ffmpeg_path
 
             await self.play_next.wait()
-
 
     # ボイスチャンネルにBOTを接続する
     @commands.command(enabled=is_enabled)
@@ -108,7 +102,6 @@ class music(commands.Cog):
             traceback.print_exc()
             print('-----')
             return
-
 
     # 曲を再生するコマンド
     @commands.command(enabled=is_enabled)
@@ -158,7 +151,6 @@ class music(commands.Cog):
 
         await self.songs.put(music_name)
 
-
     # 曲の一時停止
     @commands.command(enabled=is_enabled)
     async def pause(self, ctx):
@@ -166,7 +158,6 @@ class music(commands.Cog):
             self.voice.pause()
         else:
             await ctx.send('曲が再生されていません')
-
 
     # 曲の一時停止を解除
     @commands.command(enabled=is_enabled)
@@ -176,7 +167,6 @@ class music(commands.Cog):
         else:
             await ctx.send('一時停止されている曲はありません')
 
-
     # 再生されている曲の名前確認
     @commands.command(enabled=is_enabled)
     async def playing(self, ctx):
@@ -185,7 +175,6 @@ class music(commands.Cog):
         else:
             await ctx.send('再生されている曲はありません')
 
-
     # プレイリストの次の曲を再生
     @commands.command(enabled=is_enabled)
     async def stop(self, ctx):
@@ -193,7 +182,6 @@ class music(commands.Cog):
             self.voice.stop()
         else:
             await ctx.send('曲が再生されていません')
-
 
     # プレイリストの曲の確認
     @commands.command(enabled=is_enabled)
@@ -208,13 +196,11 @@ class music(commands.Cog):
         else:
             await ctx.send(song_list)
 
-
     # ボイスチャンネルからBOTを退出
     @commands.command(enabled=is_enabled)
     async def exit(self, ctx):
         await ctx.send('ボイスチャンネルから切断します')
         await self.voice.disconnect()
-
 
     # eval
     @commands.command(name='eval_m', enabled=is_enabled)
@@ -223,13 +209,11 @@ class music(commands.Cog):
         x = eval(str(' '.join(args)))
         await ctx.send(x)
 
-
     # exec
     @commands.command(name='exec_m', enabled=is_enabled)
     @is_developer()
     async def execution_music(self, ctx, *args):
         exec(str(' '.join(args)))
-
 
 def setup(bot):
     bot.add_cog(music(bot))

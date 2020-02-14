@@ -11,13 +11,11 @@ from   .config     import GuildId
 config_instance  = GuildId()
 (TOKEN, prefix) = config_instance.get_token_and_prefix()
 
-
 class config(commands.Cog):
     """BOTの設定
     """
     def __init__(self, bot):
         self.bot = bot
-
 
     # BOTのアクティビティを変更
     @commands.command()
@@ -25,7 +23,6 @@ class config(commands.Cog):
     async def activity(self, ctx, *args):
         game = discord.Game(' '.join(args))
         await self.bot.change_presence(status=discord.Status.online, activity=game)
-
 
     # BOTの再起動
     @commands.command()
@@ -44,14 +41,18 @@ class config(commands.Cog):
         await self.bot.login(token=TOKEN, bot=True)
         await self.bot.connect()
 
-
     # BOTをシャットダウンする
     @commands.command()
     @is_developer()
     async def shutdown(self, ctx):
-        await ctx.send('ﾉｼ')
-        await self.bot.logout()
+        def check(m):
+            return m.channel == ctx.channel and m.author.id == ctx.author.id
+        await ctx.send('シャットダウンします\n続行するには [y] を送信してください')
+        msg = await self.bot.wait_for('message', check=check)
 
+        if msg.content == 'y' or msg.content == 'Y':
+            await ctx.send('ﾉｼ')
+            await self.bot.logout()
 
 def setup(bot):
     bot.add_cog(config(bot))

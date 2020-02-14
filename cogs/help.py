@@ -22,7 +22,7 @@ class BotHelp(commands.Cog):
             "!janken [hand type]": "BOTとじゃんけんします",
             "!menber": "このサーバにいるメンバーの合計数を表示します",
             "!nether_gate [x] [z]  or  !ng [x] [z]": "minecraftのオープンワールド座標をネザーの座標に変換します",
-            "!ping": "Discord WebSocketプロトコル遅延を計測してミリ秒単位で表示します"
+            "!ping": "Discord WebSocketプロトコル遅延を計測してミリ秒単位で表示します",
             "!poll [question] *[choices] lt 10": "アンケートを作成します",
             "!poll_end  or  !pe": "投票を終了します (投票作成者のみ実行可能)",
             "~~!prime_factorization [number]  or  !pf [number]~~": "~~素因数分解します 0 ≤ number ≤ 65535~~ ",

@@ -14,7 +14,6 @@ from   .config     import GuildId
 
 ID = GuildId.get_id()
 
-
 def is_developer():
     """コマンドの実行者が開発者か確認する"""
     async def predicate(ctx):
@@ -25,11 +24,8 @@ def is_developer():
             return False
     return commands.check(predicate)
 
-
 class manage(commands.Cog):
-    """discordサーバの管理系コマンド
-
-    """
+    """discordサーバの管理系コマンド"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -52,26 +48,26 @@ class manage(commands.Cog):
 
         return embed
 
-    async def reload_extensions(self, ctx, ext_list):
+    async def load_extensions(self, ctx, func_name, ext_list, text='ロード'):
         await ctx.send('-' * 30)
         for ext_name in ext_list:
             try:
-                self.bot.reload_extension(ext_name)
+                func_name(ext_name)
 
             except Exception as e:
-                fmt = '読み込みに失敗しました： ```py\n{}: {}\n```'
-                await ctx.send(fmt.format(type(e).__name__, e))
+                fmt = '{}に失敗しました： ```py\n{}: {}\n```'
+                await ctx.send(fmt.format(text, type(e).__name__, e))
                 await ctx.send('-' * 30)
 
-                print(f'Failed to reload extension {ext_name}.', file=sys.stderr)
+                print(f'Failed to road extension {ext_name}.', file=sys.stderr)
                 traceback.print_exc()
                 print('-' * 30)
 
             else:
-                await ctx.send(f"'{ext_name}' をリロードしました")
+                await ctx.send(f"'{ext_name}' を{text}しました")
                 await ctx.send('-' * 30)
 
-        await ctx.send('すべてのリロードが完了しました')
+        await ctx.send(f'すべての{text}を終了しました')
         await ctx.send('-' * 30)
 
     @commands.command()
@@ -81,7 +77,7 @@ class manage(commands.Cog):
         author   = ctx.author.id
         ext_list = []
 
-        if len(extensions) == 0:
+        if not len(extensions):
             embed = self.choice_extension()
             await ctx.send(embed=embed)
 
@@ -102,8 +98,17 @@ class manage(commands.Cog):
             for extension in extensions:
                 ext_list.append(extension)
 
-        await self.reload_extensions(ctx, ext_list)
+        await self.load_extensions(ctx, self.bot.reload_extension, ext_list)
 
+    @commands.command()
+    @is_developer()
+    async def load(self, ctx, *extensions):
+        await self.load_extensions(ctx, self.bot.load_extension, extensions)
+
+    @commands.command()
+    @is_developer()
+    async def unload(self, ctx, *extensions):
+        await self.load_extensions(ctx, self.bot.unload_extension, extensions, 'アンロード')
 
     @commands.Cog.listener()
     async def on_member_join(self, new_member):
@@ -119,7 +124,6 @@ class manage(commands.Cog):
             await self.channel_member.send(
                 f'{mention}Suwarikaサーバへようこそ\nあなたは{member_num}人目のメンバーです'
             )
-
 
     # eval
     @commands.command(name='_eval')
@@ -148,7 +152,6 @@ class manage(commands.Cog):
         new_ctx     = await self.bot.get_context(msg, cls=type(ctx))
 
         await self.bot.invoke(new_ctx)
-
 
 def setup(bot):
     bot.add_cog(manage(bot))

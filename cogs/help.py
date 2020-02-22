@@ -28,7 +28,7 @@ class BotHelp(commands.Cog):
             "~~!prime_factorization [number]  or  !pf [number]~~": "~~素因数分解します 0 ≤ number ≤ 65535~~ ",
             "!roles": "自分についている役職を確認します",
             "!time": "日本標準時間を表示します",
-            "!timer [time]": "タイマーを設定します",
+            "!timer [time] *([label])": "タイマーを設定します/nラベルを入れると通知と一緒に表示します",
             "!wly": "ワークラボの予約時間を表示します",
             "!summon": "自分の入っているボイスチャンネルにBOTを呼び出します",
             "!play ([music name])": "曲のリストを表示します. 曲名を指定した場合はその曲を再生します.\n再生中の場合は再生リストに追加します",
@@ -80,7 +80,7 @@ class BotHelp(commands.Cog):
         while not self.bot.is_closed():
             try:
                 reaction, user = await self.bot.wait_for('reaction_add',check=help_react_check, timeout=180)
-            except:
+            except asyncio.TimeoutError:
                 await send_message.clear_reactions()
                 return
 
@@ -110,7 +110,7 @@ class BotHelp(commands.Cog):
     @commands.command()
     async def what_is_new(self, ctx):
         embed = Embed(
-            description='BOTの更新 v1.2.4\n・pingコマンドの追加',
+            description='BOTの更新 v1.2.5/ntimerコマンドの仕様変更\nワークラボの予約日になったら知らせる機能の追加',
             color=0x00ffff,
         )
         await ctx.send(embed=embed)

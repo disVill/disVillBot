@@ -15,7 +15,6 @@ import traceback
 
 from .manage       import is_developer
 
-
 class util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -124,11 +123,11 @@ class util(commands.Cog):
         await ctx.send(text)
 
     @commands.command()
-    async def timer(self, ctx, *args):
-        times = re.findall(r'\d+', ctx.message.content)
-        units = re.findall(r'[h,m,s]', ctx.message.content[6:])
+    async def timer(self, ctx, time, *msg):
+        times = re.findall(r'\d+', time)
+        units = re.findall(r'[h,m,s]', time)
 
-        if len(times) != len(units) or not len(args):
+        if len(times) != len(units):
             await ctx.send('時間指定の方法が誤っています')
             return
 
@@ -157,7 +156,9 @@ class util(commands.Cog):
 
         await ctx.send(f'タイマーを{text}に設定しました:timer:')
         await asyncio.sleep(seconds)
-        await ctx.send(f'{ctx.author.mention} {text}が経過しました:timer:')
+
+        fin_txt = f"{ctx.author.mention} {' '.join(msg) if msg else f'{text}が経過しました'}:timer:"
+        await ctx.send(fin_txt)
 
     @commands.command()
     async def time(self, ctx):
@@ -170,9 +171,13 @@ class util(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send(self.bot.latency * 1000, '[ms]')
+        await ctx.send('pong')
 
-    @commands.command(pass_context=True, hidden=True, name='eval')
+    @commands.command(aliases=['latency'])
+    async def _latency(self, ctx):
+        await ctx.send(f'{int(self.bot.latency * 1000)}[ms]')
+
+    @commands.command(pass_context=True, name='eval')
     async def _eval(self, ctx, *, body: str):
         env = {
             # 'ctx': ctx,

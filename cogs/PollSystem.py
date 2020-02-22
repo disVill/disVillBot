@@ -9,7 +9,6 @@ import traceback
 
 ID = GuildId.get_id()
 
-
 def get_numbers():
     return ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
 
@@ -20,7 +19,6 @@ class poll(commands.Cog):
         self.poll_channel = self.bot.get_channel(id=ID['channel']['poll'])
         self.voted        = []
         self.votes        = []
-
 
     # 投票用埋め込みメッセージ作成
     def get_poll(self, ctx, que, *args):
@@ -44,29 +42,24 @@ class poll(commands.Cog):
 
         return embed, choices
 
-
     # 投票数のメッセージを作成
     def get_poll_value(self, args):
         num        = get_numbers()
         polls_text = ""
 
         for number, poll in zip(num, args):
-            text        = f":{number}: : {poll} \t"
-            polls_text += text
+            polls_text += f":{number}: : {poll} \t"
 
         return polls_text
-
 
     # メッセージのリスナ
     @commands.Cog.listener()
     async def on_message(self, msg):
         # メッセージが数字で投票チャンネルに送られた時の処理
         if msg.content.isnumeric() and msg.channel == self.poll_channel:
-
             # すでに投票した人の場合
             if msg.author.id in self.voted:
                 await msg.channel.send(msg.author.mention + '  すでに投票しています')
-
             # 投票数をプラスして既投票者リストに格納
             else:
                 try:
@@ -85,7 +78,6 @@ class poll(commands.Cog):
                     print(f'Failed to poll', file=sys.stderr)
                     traceback.print_exc()
                     print('-----')
-
 
     # アンケート作成コマンド
     @commands.command()
@@ -109,7 +101,6 @@ class poll(commands.Cog):
             await ctx.send("アンケートチャンネルに \'" + que + "\' を作成しました")
             print(ctx.channel.id)
 
-
     # 投票締め切り
     @commands.command(aliases=['pe'])
     async def poll_end(self, ctx):
@@ -128,7 +119,6 @@ class poll(commands.Cog):
 
         elif self.poll_msg != '0':
             await ctx.send('投票を開始した人しか締め切ることができません')
-
 
 def setup(bot):
     bot.add_cog(poll(bot))

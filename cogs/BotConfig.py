@@ -1,6 +1,7 @@
 from   discord.ext import commands
 import discord
 
+import datetime
 import os
 import sys
 
@@ -17,12 +18,26 @@ class config(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command()
+    async def activity_init(self, ctx):
+        activity = discord.Activity(
+            name='Is the Order a Rabbit?',
+            url='http://www.dokidokivisual.com/',
+            type=discord.ActivityType.watching,
+            state='In front of TV',
+            details='カフェラテ・カフェモカ・カプチーノ！',
+            start=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))),
+            large_image_url='https://gochiusa.com/01/core_sys/images/main/logo.png',
+            large_image_text='ご注文はうさぎですか？',
+            )
+        await self.bot.change_presence(status=discord.Status.online, activity=activity)
+
     # BOTのアクティビティを変更
     @commands.command()
     @commands.has_permissions(manage_guild=True)
     async def activity(self, ctx, *args):
-        game = discord.Game(' '.join(args))
-        await self.bot.change_presence(status=discord.Status.online, activity=game)
+        activity = discord.Activity(name=' '.join(args), type=discord.ActivityType.watching)
+        await self.bot.change_presence(status=discord.Status.online, activity=activity)
 
     # BOTの再起動
     @commands.command()
@@ -44,13 +59,18 @@ class config(commands.Cog):
     # BOTをシャットダウンする
     @commands.command()
     @is_developer()
-    async def shutdown(self, ctx):
-        def check(m):
-            return m.channel == ctx.channel and m.author.id == ctx.author.id
-        await ctx.send('シャットダウンします\n続行するには [y] を送信してください')
-        msg = await self.bot.wait_for('message', check=check)
+    async def shutdown(self, ctx, Option):
+        if Option != '-q':
+            def check(m):
+                return m.channel == ctx.channel and m.author.id == ctx.author.id
+            await ctx.send('シャットダウンします\n続行するには [y] を送信してください')
+            msg = await self.bot.wait_for('message', check=check)
 
-        if msg.content == 'y' or msg.content == 'Y':
+            if msg.content == 'y' or msg.content == 'Y':
+                await ctx.send('ﾉｼ')
+                await self.bot.logout()
+
+        else:
             await ctx.send('ﾉｼ')
             await self.bot.logout()
 

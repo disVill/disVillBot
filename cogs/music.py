@@ -201,6 +201,7 @@ class music(commands.Cog):
     async def exit(self, ctx):
         await ctx.send('ボイスチャンネルから切断します')
         await self.voice.disconnect()
+        self.voice = None
 
     # eval
     @commands.command(name='eval_m', enabled=is_enabled)

@@ -4,31 +4,18 @@ import os
 class BotAuth:
     bot_token      = '' or os.environ.get('TOKEN')
     dammy_token    = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken'
-    command_prefix = '!'
-
+    command_prefix = ''
 
 class SiteUrls:
     url = {
         'wly': 'https://wly.jp/',
     }
 
-
-
 class GuildId:
     def __init__(self):
         self.token  = BotAuth.bot_token
         self.prefix = BotAuth.command_prefix or '!'
-
-
-    def get_token_and_prefix(self):
-        if self.token is None or len(self.token) != 59:
-            return os.environ.get('TOKEN'), self.prefix
-        else:
-            return self.token, self.prefix
-
-
-    def get_id():
-        return {
+        self.id_list = {
             'user': {
                 'develop' : 578507026943049728,
             },
@@ -57,10 +44,7 @@ class GuildId:
                 'suwarika': 626401720053792768,
             },
         }
-
-
-    def get_keycap():
-        return (
+        self.keycap_list = (
             "1\N{combining enclosing keycap}",
             "2\N{combining enclosing keycap}",
             "3\N{combining enclosing keycap}",
@@ -72,3 +56,15 @@ class GuildId:
             "9\N{combining enclosing keycap}",
             "\N{keycap ten}",
         )
+
+    def get_token_and_prefix(self):
+        if self.token is None or len(self.token) != 59:
+            return os.environ.get('TOKEN'), self.prefix
+        else:
+            return self.token, self.prefix
+
+    def get_id(self):
+        return self.id_list
+
+    def get_keycap(self):
+        return keycap_list

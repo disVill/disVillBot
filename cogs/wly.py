@@ -6,24 +6,25 @@ import datetime
 
 from   .config     import SiteUrls, GuildId
 
-ID = GuildId.get_id()
+config_instance = GuildId()
+ID = config_instance.get_id()
 
 class WlyBook:
     def __init__(self):
         self.wly_book_list = {
-            '02/22': '02/23(日) 15:00-20:00',
+            '02/23': '02/23(日) 15:00-20:00',
         }
 
     def get_wly_book_list(self):
-        return self.wly_book_list
+        return self.wly_book_list or {'00/00': '予約はありません 00:00'}
 
 
 class WorkLabYatsugatake(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.notice_loop.start()
-        self.wly = WlyBook()
-        self.wly_book_list = self.wly.get_wly_book_list()
+        self.wly_instance = WlyBook()
+        self.wly_book_list = self.wly_instance.get_wly_book_list()
 
     def book_list_embed(self):
         list_text = ""
@@ -43,7 +44,7 @@ class WorkLabYatsugatake(commands.Cog):
 
         for day, time in self.wly_book_list.items():
             if now == day + '/08':
-                channel = self.bot.get_channel(id=ID['channel']['chat'])
+                channel = self.bot.get_channel(id=ID['channel']['logs'])
                 await channel.send(f'@everyone\n今日はワークラボの予約日です\n{time.split().pop(1)}')
 
     @commands.group()

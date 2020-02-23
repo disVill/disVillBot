@@ -21,14 +21,14 @@ class config(commands.Cog):
     @commands.command()
     async def activity_init(self, ctx):
         activity = discord.Activity(
-            name='Is the Order a Rabbit?',
+            name='ご注文はうさぎですか？',
             url='http://www.dokidokivisual.com/',
             type=discord.ActivityType.watching,
             state='In front of TV',
             details='カフェラテ・カフェモカ・カプチーノ！',
             start=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))),
             large_image_url='https://gochiusa.com/01/core_sys/images/main/logo.png',
-            large_image_text='ご注文はうさぎですか？',
+            large_image_text='Is the Order a Rabbit?',
             )
         await self.bot.change_presence(status=discord.Status.online, activity=activity)
 

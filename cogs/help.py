@@ -64,7 +64,7 @@ class BotHelp(commands.Cog):
         send_message = await ctx.send(embed=self.get_help_embed(1))
         await send_message.add_reaction("➡")
 
-        def help_react_check(reaction,user):
+        def help_react_check(reaction, user):
             '''
             ヘルプに対する、ヘルプリクエスト者本人からのリアクションかをチェックする
             '''
@@ -79,8 +79,8 @@ class BotHelp(commands.Cog):
 
         while not self.bot.is_closed():
             try:
-                reaction, user = await self.bot.wait_for('reaction_add',check=help_react_check, timeout=180)
-            except asyncio.TimeoutError:
+                reaction, _ = await self.bot.wait_for('reaction_add',check=help_react_check, timeout=180)
+            except TimeoutError:
                 await send_message.clear_reactions()
                 return
 

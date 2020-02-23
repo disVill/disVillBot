@@ -8,7 +8,8 @@ import traceback
 
 from   .config      import GuildId
 
-ID = GuildId.get_id()
+config_instance = GuildId()
+ID = config_instance.get_id()
 
 class event(commands.Cog):
     def __init__(self, bot):

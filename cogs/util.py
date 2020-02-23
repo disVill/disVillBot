@@ -94,7 +94,7 @@ class util(commands.Cog):
         category_id = ctx.channel.category_id
         category    = ctx.guild.get_channel(category_id)
         await category.create_text_channel(name=' '.join(args))
-        await ctx.send(f"新しいチャンネル'{arg}'を作りました")
+        await ctx.send(f"新しいチャンネル'{' '.join(args)}'を作りました")
 
     @commands.command(aliases=['role'])
     async def roles(self, ctx):

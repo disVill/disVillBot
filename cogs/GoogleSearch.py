@@ -13,7 +13,6 @@ class GoogleSearch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     # 引数に入れた単語をgoogleで検索
     @commands.group()
     async def google(self, ctx):

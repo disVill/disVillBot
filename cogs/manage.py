@@ -12,7 +12,8 @@ from   bot         import fetch_extensions
 from   .PollSystem import get_numbers
 from   .config     import GuildId
 
-ID = GuildId.get_id()
+config_instance = GuildId()
+ID = config_instance.get_id()
 
 def is_developer():
     """コマンドの実行者が開発者か確認する"""

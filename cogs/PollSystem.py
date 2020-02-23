@@ -7,7 +7,8 @@ from   .config     import GuildId
 import sys
 import traceback
 
-ID = GuildId.get_id()
+config_instance = GuildId()
+ID = config_instance.get_id()
 
 def get_numbers():
     return ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
@@ -25,19 +26,16 @@ class poll(commands.Cog):
         choices = 0
         numbers = get_numbers()
         text    = ""
-
         # 選択肢を格納、数をカウント
         for number, arg in zip(numbers, args):
             text    += f":{number}:  {arg}\n"
             choices += 1
-
         # 埋め込みを生成
         embed = Embed(
             title       = f"**{que}**",
             description = text,
             color       = 0xffff00,
         )
-
         embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
 
         return embed, choices
@@ -84,30 +82,23 @@ class poll(commands.Cog):
     async def poll(self, ctx, que, *args):
         # 投票数と投票者リストの初期化
         self.votes, self.voted = [], []
-
         # 投票用メッセージ生成、送信
         (embed, choices) = self.get_poll(ctx, que, *args)
         self.poll_msg = await self.poll_channel.send(embed=embed)
-
         # 投票数リストに選択肢の数だけ０を生成
         for i in range(choices):
             self.votes.append(0)
-
         # 投票者のIDを保存
         self.poll_author = ctx.author.id
-
         # コマンドが送られたのが投票チャンネルではなかった時
         if ctx.channel.id != self.poll_channel.id:
             await ctx.send("アンケートチャンネルに \'" + que + "\' を作成しました")
-            print(ctx.channel.id)
 
     # 投票締め切り
     @commands.command(aliases=['pe'])
     async def poll_end(self, ctx):
-
         # 投票作成者本人かどうか
         if ctx.author.id == self.poll_author:
-
             # 投票にかかわるリストなどを初期化
             self.poll_msg    = '0'
             self.poll_author = '0'

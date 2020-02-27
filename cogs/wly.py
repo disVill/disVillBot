@@ -48,7 +48,7 @@ class WorkLabYatsugatake(commands.Cog):
 
         for day, time in self.wly_book_list.items():
             if now == day + '/08':
-                channel = self.bot.get_channel(id=ID['channel']['logs'])
+                channel = self.bot.get_channel(id=ID['channel']['chat'])
                 await channel.send(f'@everyone\n今日はワークラボの予約日です\n{time.split().pop(1)}')
 
     @commands.group()

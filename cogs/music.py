@@ -1,89 +1,70 @@
 from   discord.ext import commands
 from   discord     import Embed
-from   discord     import FFmpegPCMAudio as FFmpeg
 import discord
 
 import asyncio
+import googlesearch
 import random
 import sys
 import traceback
 from   unicodedata import numeric
+import youtube_dl
 
 from   .manage     import is_developer
 
-# ffmpeg.exeのパスを指定する
-# bot.pyと同じディレクトリにある時はいらない
-# ffmpeg_path = r"C:\your\path\ffmpeg.exe"
+youtube_dl.utils.bug_reports_message = lambda: ''
 
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
+
+# ffmpeg_path = r"C:\Program Files\ffmpeg-20191109-bb190de-win64-static\bin\ffmpeg.exe"
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
-# ドキドキ文芸部のサントラ 曲名
-def music_list():
-    return [
-        'Doki Doki Literature Club!',
-        'Ohayou Sayori!',
-        'Dreams Of Love and Literature',
-        'Okay, Everyone!',
-        'Play With Me',
-        'Poem Panic!',
-        'Daijoubu!',
-        'My Feelings',
-        'My Confession',
-        'Sayo-nara',
-        'Just Monika.',
-        'I Still Love You',
-        'Your Reality (Credits)',
-        # 'Poems Are Forever (Bonus Track)',
-        # 'Doki Doki (Bonus Track)',
-    ]
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.2):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = data.get('url')
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), data=data)
+        #  executable=ffmpeg_path
 
 class music(commands.Cog):
     """mp3の音楽再生機能"""
 
     def __init__(self, bot):
-        self.bot          = bot
-        self.voice        = None
-        self.play_next    = asyncio.Event()
-        self.songs        = asyncio.Queue()
-        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-
-    # 曲リストから埋め込みメッセージ作成
-    def music_list_embed(self):
-        list_text = ""
-        choices   = 1
-
-        # 曲リストをメッセージに入れる
-        for name in music_list():
-            list_text += f"**{choices}**:   {name}\n"
-            choices   += 1
-
-        list_text += '\n**0**:   ランダムに曲を再生'
-
-        # できたオブジェクトから埋め込み生成
-        embed = Embed(
-            title       = '**再生する曲の番号を選択してください**',
-            description = list_text,
-            color       = 0x00ffff,
-        )
-
-        return embed
-
-    def toggle_next(self, error):
-        self.bot.loop.call_soon_threadsafe(self.play_next.set)
-        print('error check:' + error)
-
-    # songsキューに入れた曲リストを一つづつ取り出して再生
-    async def audio_player_task(self):
-        while True:
-            self.play_next.clear()
-            self.playing_music = await self.songs.get()
-            self.path = f"DDLC/{self.playing_music}.mp3"
-
-            self.voice.play(FFmpeg(source=self.path), after=self.toggle_next)
-            # ffmpeg_pathを指定したときは下の引数をFFmpeg()へ追加する
-            # executable=ffmpeg_path
-
-            await self.play_next.wait()
+        self.bot   = bot
+        self.voice = None
+        self.playing_music = None
 
     # ボイスチャンネルにBOTを接続する
     @commands.command(enabled=is_enabled)
@@ -105,51 +86,24 @@ class music(commands.Cog):
 
     # 曲を再生するコマンド
     @commands.command(enabled=is_enabled)
-    async def play(self, ctx, *music_name):
-        author  = ctx.author.id
-        channel = ctx.channel
-
-        # ボイスチャンネルに接続しているか確認
+    async def play(self, ctx, *, url):
         if (self.voice is None) or (not self.voice.is_connected()):
             if ctx.author.voice is None:
                 await ctx.send('ボイスチャンネルに接続してください')
                 return
-            else:
-                await ctx.invoke(self.summon)
+            await ctx.invoke(self.summon)
 
-        # 曲名が指定されているか確認
-        if len(music_name) == 0:
+        if not url.startswith("https://www.youtube.com/watch?v="):
+            for u in googlesearch.search(url, lang='jp', num=1, tpe='vid'):
+                url = u
+                break
 
-            # 指定されていないとき
-            embed = self.music_list_embed()
-            await ctx.send(embed=embed)
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            self.voice.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
-            # ユーザからの曲番号メッセージ待ちとチェック
-            def check(m):
-                return m.channel == channel and m.author.id == author
-            num = await self.bot.wait_for('message', check=check)
-
-            # 指定された曲を変数へ代入
-            if num.content.isnumeric:
-                if num.content == '0':
-                    music_name = random.choice(music_list())
-                else:
-                    music_name = music_list()[int(num.content) - 1]
-
-            else:
-                music_name = ' '.join(num.content)
-
-        else:
-            # 引数の曲名をつなげてセットする
-            music_name = ' '.join(music_name)
-
-        # 曲を再生
-        if self.voice.is_playing():
-            await ctx.send(f"'{music_name}' プレイリストに追加しました")
-        else:
-            await ctx.send(f"'{music_name}' を再生します")
-
-        await self.songs.put(music_name)
+        await ctx.send('Now playing: {}'.format(player.title))
+        self.playing_music = player.title
 
     # 曲の一時停止
     @commands.command(enabled=is_enabled)
@@ -182,19 +136,6 @@ class music(commands.Cog):
             self.voice.stop()
         else:
             await ctx.send('曲が再生されていません')
-
-    # プレイリストの曲の確認
-    @commands.command(enabled=is_enabled)
-    async def playlist(self, ctx):
-        song_list = ''
-
-        for name in self.songs._queue:
-            song_list += f"'{name}'  "
-
-        if song_list is None:
-            await ctx.send('プレイリストに登録されている曲はありません')
-        else:
-            await ctx.send(song_list)
 
     # ボイスチャンネルからBOTを退出
     @commands.command(enabled=is_enabled)

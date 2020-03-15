@@ -32,12 +32,12 @@ ffmpeg_options = {
     'options': '-vn'
 }
 
-# ffmpeg_path = r"C:\Program Files\ffmpeg-20191109-bb190de-win64-static\bin\ffmpeg.exe"
+ffmpeg_path = r"C:\Program Files\ffmpeg-20191109-bb190de-win64-static\bin\ffmpeg.exe"
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
 class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.2):
+    def __init__(self, source, *, data, volume=0.3):
         super().__init__(source, volume)
 
         self.data = data
@@ -55,8 +55,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), data=data)
-        #  executable=ffmpeg_path
+        return cls(discord.FFmpegPCMAudio(source=filename, executable=ffmpeg_path, **ffmpeg_options), data=data)
+        #
 
 class music(commands.Cog):
     """mp3の音楽再生機能"""
@@ -84,6 +84,42 @@ class music(commands.Cog):
             print('-----')
             return
 
+    async def m_player(self, ctx, msg):
+        [await msg.add_reaction(r) for r in ("⏸", "⏹")]
+
+        def react_check(reaction, user):
+            emoji = str(reaction.emoji)
+            if user != ctx.author or reaction.message.id != msg.id:
+                return
+            if emoji == "▶" or emoji == "⏹" or emoji == "⏸":
+                return True
+
+        while self.voice.is_playing() or self.voice.is_paused():
+            try:
+                reaction, _ = await self.bot.wait_for('reaction_add',check=react_check, timeout=30)
+            except asyncio.TimeoutError:
+                continue
+
+            emoji = str(reaction.emoji)
+            if emoji == "⏸" and not self.voice.is_paused():
+                self.voice.pause()
+            elif emoji == "⏹":
+                self.voice.stop()
+                break
+            elif emoji == "▶" and self.voice.is_paused():
+                self.voice.resume()
+            await msg.clear_reactions()
+
+            try:
+                if self.voice.is_paused():
+                    [await msg.add_reaction(r) for r in ("▶", "⏹")]
+                elif self.voice.is_playing():
+                    [await msg.add_reaction(r) for r in ("⏸", "⏹")]
+            except KeyError:
+                pass
+
+        await msg.clear_reactions()
+
     # 曲を再生するコマンド
     @commands.command(enabled=is_enabled)
     async def play(self, ctx, *, url):
@@ -93,17 +129,15 @@ class music(commands.Cog):
                 return
             await ctx.invoke(self.summon)
 
-        if not url.startswith("https://www.youtube.com/watch?v="):
-            for u in googlesearch.search(url, lang='jp', num=1, tpe='vid'):
-                url = u
-                break
-
         async with ctx.typing():
+            if not url.startswith("https://www.youtube.com/watch?v="):
+                url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
             self.voice.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
-        await ctx.send('Now playing: {}'.format(player.title))
+        msg = await ctx.send('Now playing: {}'.format(player.title))
         self.playing_music = player.title
+        await self.m_player(ctx, msg)
 
     # 曲の一時停止
     @commands.command(enabled=is_enabled)

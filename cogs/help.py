@@ -2,6 +2,8 @@ from   discord.ext import commands
 from   discord     import Embed
 import discord
 
+import asyncio
+
 
 class BotHelp(commands.Cog):
 
@@ -80,7 +82,7 @@ class BotHelp(commands.Cog):
         while not self.bot.is_closed():
             try:
                 reaction, _ = await self.bot.wait_for('reaction_add',check=help_react_check, timeout=180)
-            except TimeoutError:
+            except asyncio.TimeoutError:
                 await send_message.clear_reactions()
                 return
 

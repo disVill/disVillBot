@@ -110,7 +110,7 @@ class BotHelp(commands.Cog):
     @commands.command()
     async def what_is_new(self, ctx):
         embed = Embed(
-            description='BOTの更新 v1.2.5/ntimerコマンドの仕様変更\nワークラボの予約日になったら知らせる機能の追加',
+            description='BOTの更新 v1.2.6/nバグ修正',
             color=0x00ffff,
         )
         await ctx.send(embed=embed)

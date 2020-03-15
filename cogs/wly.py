@@ -44,11 +44,11 @@ class WorkLabYatsugatake(commands.Cog):
 
     @tasks.loop(hours=1)
     async def notice_loop(self):
-        now = datetime.datetime.now().strftime('%m/%d/%H')
+        now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%m/%d/%H')
 
         for day, time in self.wly_book_list.items():
             if now == day + '/08':
-                channel = self.bot.get_channel(id=ID['channel']['logs'])
+                channel = self.bot.get_channel(id=ID['channel']['chat'])
                 await channel.send(f'@everyone\n今日はワークラボの予約日です\n{time.split().pop(1)}')
 
     @commands.group()

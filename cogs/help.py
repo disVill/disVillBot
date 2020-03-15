@@ -33,7 +33,7 @@ class BotHelp(commands.Cog):
             "!summon": "自分の入っているボイスチャンネルにBOTを呼び出します",
             "!play [music name or YouTube URL]": "曲名かYouTubeのURLを指定するとその曲を再生します",
             "!pause": "曲を一時停止します",
-            "!playing": "再生中の曲名を表示します"
+            "!playing": "再生中の曲名を表示します",
             "!resume": "曲の再生を再開します",
             "!stop": "曲の再生を停止します",
             "!exit": "BOTを今いるボイスチャンネルから切断します",

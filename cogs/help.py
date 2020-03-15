@@ -22,7 +22,7 @@ class BotHelp(commands.Cog):
             "!janken [hand type]": "BOTとじゃんけんします",
             "!menber": "このサーバにいるメンバーの合計数を表示します",
             "!nether_gate [x] [z]  or  !ng [x] [z]": "minecraftのオープンワールド座標をネザーの座標に変換します",
-            "!ping": "Discord WebSocketプロトコル遅延を計測してミリ秒単位で表示します",
+            "!latency": "Discord WebSocketプロトコル遅延を計測してミリ秒単位で表示します",
             "!poll [question] *[choices] lt 10": "アンケートを作成します",
             "!poll_end  or  !pe": "投票を終了します (投票作成者のみ実行可能)",
             "~~!prime_factorization [number]  or  !pf [number]~~": "~~素因数分解します 0 ≤ number ≤ 65535~~ ",
@@ -31,11 +31,11 @@ class BotHelp(commands.Cog):
             "!timer [time] *([label])": "タイマーを設定します/nラベルを入れると通知と一緒に表示します",
             "!wly": "ワークラボの予約時間を表示します",
             "!summon": "自分の入っているボイスチャンネルにBOTを呼び出します",
-            "!play ([music name])": "曲のリストを表示します. 曲名を指定した場合はその曲を再生します.\n再生中の場合は再生リストに追加します",
+            "!play [music name or YouTube URL]": "曲名かYouTubeのURLを指定するとその曲を再生します",
             "!pause": "曲を一時停止します",
+            "!playing": "再生中の曲名を表示します"
             "!resume": "曲の再生を再開します",
-            "!stop": "曲の再生を停止します. 再生リストに曲がある場合は次の曲を再生します",
-            "!playlist": "再生リストに登録されている曲を表示します",
+            "!stop": "曲の再生を停止します",
             "!exit": "BOTを今いるボイスチャンネルから切断します",
         }
 
@@ -110,7 +110,7 @@ class BotHelp(commands.Cog):
     @commands.command()
     async def what_is_new(self, ctx):
         embed = Embed(
-            description='BOTの更新 v1.2.6/nバグ修正',
+            description='BOTの更新 v1.2.7/nBotのplayコマンドの仕様変更',
             color=0x00ffff,
         )
         await ctx.send(embed=embed)

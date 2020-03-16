@@ -32,7 +32,7 @@ ffmpeg_options = {
     'options': '-vn'
 }
 
-ffmpeg_path = r"C:\Program Files\ffmpeg-20191109-bb190de-win64-static\bin\ffmpeg.exe"
+# ffmpeg_path = r"C:\Program Files\ffmpeg-20191109-bb190de-win64-static\bin\ffmpeg.exe"
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
@@ -55,8 +55,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(source=filename, executable=ffmpeg_path, **ffmpeg_options), data=data)
-        #
+        return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), data=data)
+        # executable=ffmpeg_path
 
 class music(commands.Cog):
     def __init__(self, bot):

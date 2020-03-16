@@ -9,7 +9,6 @@ import sys
 import traceback
 
 from   bot         import fetch_extensions
-from   .PollSystem import get_numbers
 from   .config     import GuildId
 
 config_instance = GuildId()
@@ -34,7 +33,7 @@ class manage(commands.Cog):
 
     def choice_extension(self):
         list_text  = ""
-        numbers    = get_numbers()
+        numbers    = ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten')
         extensions = fetch_extensions()
 
         for number, ext in zip(numbers, extensions):

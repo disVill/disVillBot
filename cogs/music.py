@@ -59,39 +59,18 @@ class YTDLSource(discord.PCMVolumeTransformer):
         #
 
 class music(commands.Cog):
-    """mp3の音楽再生機能"""
-
     def __init__(self, bot):
         self.bot   = bot
         self.voice = None
         self.playing_music = None
 
-    # ボイスチャンネルにBOTを接続する
-    @commands.command(enabled=is_enabled)
-    async def summon(self, ctx):
-        if not discord.opus.is_loaded():
-            discord.opus.load_opus("heroku-buildpack-libopus")
-
-        try:
-            await ctx.send('ボイスチャンネルへ接続します')
-            self.voice = await ctx.author.voice.channel.connect()
-
-        except Exception as e:
-            fmt = 'エラー ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
-            await ctx.send(fmt.format(type(e).__name__, e))
-            print(f'Failed to connect voic3 channel', file=sys.stderr)
-            traceback.print_exc()
-            print('-----')
-            return
-
     async def m_player(self, ctx, msg):
         [await msg.add_reaction(r) for r in ("⏸", "⏹")]
 
         def react_check(reaction, user):
-            emoji = str(reaction.emoji)
             if user != ctx.author or reaction.message.id != msg.id:
                 return
-            if emoji == "▶" or emoji == "⏹" or emoji == "⏸":
+            if (emoji := str(reaction.emoji)) == "▶" or emoji == "⏹" or emoji == "⏸":
                 return True
 
         while self.voice.is_playing() or self.voice.is_paused():
@@ -100,8 +79,7 @@ class music(commands.Cog):
             except asyncio.TimeoutError:
                 continue
 
-            emoji = str(reaction.emoji)
-            if emoji == "⏸" and not self.voice.is_paused():
+            if (emoji := str(reaction.emoji)) == "⏸" and not self.voice.is_paused():
                 self.voice.pause()
             elif emoji == "⏹":
                 self.voice.stop()
@@ -139,6 +117,24 @@ class music(commands.Cog):
         self.playing_music = player.title
         await self.m_player(ctx, msg)
 
+    # ボイスチャンネルにBOTを接続する
+    @commands.command(enabled=is_enabled)
+    async def summon(self, ctx):
+        if not discord.opus.is_loaded():
+            discord.opus.load_opus("heroku-buildpack-libopus")
+
+        try:
+            await ctx.send('ボイスチャンネルへ接続します')
+            self.voice = await ctx.author.voice.channel.connect()
+
+        except Exception as e:
+            fmt = 'エラー ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
+            await ctx.send(fmt.format(type(e).__name__, e))
+            print(f'Failed to connect voic3 channel', file=sys.stderr)
+            traceback.print_exc()
+            print('-----')
+            return
+
     # 曲の一時停止
     @commands.command(enabled=is_enabled)
     async def pause(self, ctx):
@@ -158,7 +154,7 @@ class music(commands.Cog):
     # 再生されている曲の名前確認
     @commands.command(enabled=is_enabled)
     async def playing(self, ctx):
-        if self.voice.is_playing:
+        if self.voice.is_playing or self.voice.is_paused():
             await ctx.send(f"'{self.playing_music}' が再生されています")
         else:
             await ctx.send('再生されている曲はありません')

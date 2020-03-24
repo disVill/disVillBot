@@ -19,9 +19,7 @@ def is_developer():
     async def predicate(ctx):
         if ctx.author.id == ID['user']['develop']:
             return True
-        else:
-            await ctx.send("実行する権限がありません")
-            return False
+        await ctx.send("実行する権限がありません")
     return commands.check(predicate)
 
 class manage(commands.Cog):
@@ -114,26 +112,24 @@ class manage(commands.Cog):
     async def on_member_join(self, new_member):
         if new_member.bot:
             return
-        else:
-            new_member_role = discord.utils.find(lambda role: role.name == 'member', new_member.guild.roles)
-            member_num      = new_member.guild.member_count
-            mention         = new_member.mention
+        member_role = discord.utils.find(lambda role: role.name == 'member', new_member.guild.roles)
+        member_num = new_member.guild.member_count
 
-            if new_member_role is not None:
-                await new_member.add_roles(new_member_role)
-            await self.channel_member.send(
-                f'{mention}Suwarikaサーバへようこそ\nあなたは{member_num}人目のメンバーです'
-            )
+        if member_role is not None:
+            await new_member.add_roles(member_role)
+        await self.channel_member.send(
+            f'{new_member.mention}Suwarikaサーバへようこそ\nあなたは{member_num}人目のメンバーです'
+        )
 
     # eval
-    @commands.command(name='_eval')
+    @commands.command(name='eval_')
     @is_developer()
     async def evaluation(self, ctx, *args):
         x = eval(str(' '.join(args)))
         await ctx.send(x)
 
     # exec
-    @commands.command(name='exec')
+    @commands.command(name='exec_')
     @is_developer()
     async def execution(self, ctx, *args):
         exec(str(' '.join(args)))
@@ -142,7 +138,6 @@ class manage(commands.Cog):
     @commands.command(hidden=True)
     @is_developer()
     async def sudo(self, ctx, who: discord.User, *, command: str):
-
         msg         = copy.copy(ctx.message)
         channel     = ctx.channel
         msg.channel = channel
@@ -150,7 +145,6 @@ class manage(commands.Cog):
         msg.content = ctx.prefix + command
 
         new_ctx     = await self.bot.get_context(msg, cls=type(ctx))
-
         await self.bot.invoke(new_ctx)
 
 def setup(bot):

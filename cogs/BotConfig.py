@@ -13,8 +13,7 @@ config_instance  = GuildId()
 (TOKEN, prefix) = config_instance.get_token_and_prefix()
 
 class config(commands.Cog):
-    """BOTの設定
-    """
+    """BOTの設定"""
     def __init__(self, bot):
         self.bot = bot
 
@@ -44,35 +43,26 @@ class config(commands.Cog):
     @is_developer()
     async def restart(self, ctx):
         await ctx.send('再起動します')
-
-        # extensionをアンロードする
-        for ext_name in fetch_extensions():
-            self.bot.unload_extension(ext_name)
-
-        # BOTを再オープンする
+        [self.bot.unload_extension(e) for e in fetch_extensions()]
         self.bot.clear()
 
-        # BOTをDiscordにログイン、接続
         await self.bot.login(token=TOKEN, bot=True)
         await self.bot.connect()
 
     # BOTをシャットダウンする
     @commands.command()
     @is_developer()
-    async def shutdown(self, ctx, Option):
+    async def shutdown(self, ctx, Option: str=""):
         if Option != '-q':
-            def check(m):
-                return m.channel == ctx.channel and m.author.id == ctx.author.id
+            def check(m: object) -> bool:
+                return m.channel.id == ctx.channel.id and m.author.id == ctx.author.id
+
             await ctx.send('シャットダウンします\n続行するには [y] を送信してください')
             msg = await self.bot.wait_for('message', check=check)
-
-            if msg.content == 'y' or msg.content == 'Y':
-                await ctx.send('ﾉｼ')
-                await self.bot.logout()
-
-        else:
-            await ctx.send('ﾉｼ')
-            await self.bot.logout()
+            if not (msg.content in ['y', 'Y']):
+                return
+        await ctx.send('ﾉｼ')
+        await self.bot.logout()
 
 def setup(bot):
     bot.add_cog(config(bot))

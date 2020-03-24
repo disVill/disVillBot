@@ -20,7 +20,7 @@ class util(commands.Cog):
         self.bot = bot
         self._last_result = None
 
-    def cleanup_code(self, content):
+    def cleanup_code(self, content: str) -. str:
         # remove ```py\n```
         if content.startswith('```') and content.endswith('```'):
             return '\n'.join(content.split('\n')[1:-1])
@@ -90,7 +90,7 @@ class util(commands.Cog):
 
     @commands.command()
     @is_developer()
-    async def make_ch(self, ctx, *args):
+    async def make_ch(self, ctx, *, args):
         category_id = ctx.channel.category_id
         category    = ctx.guild.get_channel(category_id)
         await category.create_text_channel(name=' '.join(args))
@@ -174,7 +174,7 @@ class util(commands.Cog):
         await ctx.send('pong')
 
     @commands.command(aliases=['latency'])
-    async def _latency(self, ctx):
+    async def latency_(self, ctx):
         await ctx.send(f'{int(self.bot.latency * 1000)}[ms]')
 
     @commands.command(pass_context=True, name='eval')

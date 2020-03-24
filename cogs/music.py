@@ -51,7 +51,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
         if 'entries' in data:
-            # take first item from a playlist
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
@@ -64,14 +63,21 @@ class music(commands.Cog):
         self.voice = None
         self.playing_music = None
 
-    async def m_player(self, ctx, msg):
-        [await msg.add_reaction(r) for r in ("⏸", "⏹")]
+    async def add_react(self, msg: object) -> None:
+        try:
+            if self.voice.is_playing():
+                [await msg.add_reaction(r) for r in ("⏸", "⏹")]
+            elif self.voice.is_paused():
+                [await msg.add_reaction(r) for r in ("▶", "⏹")]
+        except KeyError: ...
 
-        def react_check(reaction, user):
-            if user != ctx.author or reaction.message.id != msg.id:
-                return
-            if (emoji := str(reaction.emoji)) == "▶" or emoji == "⏹" or emoji == "⏸":
-                return True
+    async def m_player(self, user_id: int, msg: object) -> None:
+        await self.add_react(msg)
+
+        def react_check(r: object, u: object) -> bool:
+            if u.id != user_id or r.message.id != msg.id:
+                return False
+            return str(r.emoji) in ("▶", "⏹", "⏸")
 
         while self.voice.is_playing() or self.voice.is_paused():
             try:
@@ -81,20 +87,14 @@ class music(commands.Cog):
 
             if (emoji := str(reaction.emoji)) == "⏸" and not self.voice.is_paused():
                 self.voice.pause()
+            elif emoji == "▶" and self.voice.is_paused():
+                self.voice.resume()
             elif emoji == "⏹":
                 self.voice.stop()
                 break
-            elif emoji == "▶" and self.voice.is_paused():
-                self.voice.resume()
             await msg.clear_reactions()
 
-            try:
-                if self.voice.is_paused():
-                    [await msg.add_reaction(r) for r in ("▶", "⏹")]
-                elif self.voice.is_playing():
-                    [await msg.add_reaction(r) for r in ("⏸", "⏹")]
-            except KeyError:
-                pass
+            await self.add_react(msg)
 
         await msg.clear_reactions()
 
@@ -115,7 +115,7 @@ class music(commands.Cog):
 
         msg = await ctx.send('Now playing: {}'.format(player.title))
         self.playing_music = player.title
-        await self.m_player(ctx, msg)
+        await self.m_player(ctx.author.id, msg)
 
     # ボイスチャンネルにBOTを接続する
     @commands.command(enabled=is_enabled)

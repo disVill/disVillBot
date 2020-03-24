@@ -1,5 +1,6 @@
 discord.py[voice] == 1.2.5
 google
+googletrans
 pyNaCl
 youtube_dl
 # matplotlib

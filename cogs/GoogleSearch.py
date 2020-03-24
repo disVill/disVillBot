@@ -1,11 +1,12 @@
-from   discord.ext   import commands
-from   discord       import Embed
+from discord.ext   import commands
+from discord       import Embed
 import discord
 
-from   googlesearch  import search
+from googlesearch  import search
+from googletrans import Translator
 
 
-class GoogleSearch(commands.Cog):
+class Google(commands.Cog):
     """
     google関係
     """
@@ -20,9 +21,8 @@ class GoogleSearch(commands.Cog):
             keyword = ' '.join(ctx.message.content.split()[1:])
             print(f'google search log: {keyword}')
 
-            for url in search(keyword, lang='jp', num=1):
-                await ctx.send(url)
-                break
+            url = search(keyword, lang='jp', num=1).__next__()
+            await ctx.send(url)
 
     # google検索のヘルプ
     @google.group(name='--help')
@@ -35,6 +35,13 @@ class GoogleSearch(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['googletrans', 'googletranslate', 'trans'])
+    async def translate(self, ctx, *, text):
+        translator = Translator()
+        dest = 'ja'
+        translated = translator.translate(text, dest=dest)
+        await ctx.send(f"From: **{translated.src}**, To: **{dest}**\n{translated.text}")
+
 
 def setup(bot):
-    bot.add_cog(GoogleSearch(bot))
+    bot.add_cog(Google(bot))

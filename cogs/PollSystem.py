@@ -1,44 +1,41 @@
-from   discord     import Embed
-from   discord.ext import commands
+from discord import Embed
+from discord.ext import commands
 import discord
 
-from   unicodedata import numeric
-from   .config     import GuildId
+from .config import GuildId
 import asyncio
-import sys
-import traceback
 
 config_instance = GuildId()
 ID = config_instance.get_id()
-KEYCAP = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟")
-NUMBERS = ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'keycap_ten')
+KEYCAP = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
+NUMBERS = ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine')
+COLORS = ('yellow', 'green', 'purple', 'brown', 'red', 'blue', 'orange', 'white_large', 'black_large')
+
 
 class PollEmbed(object):
-    def __init__(self, bot, embed, author, que, choices):
+    def __init__(self, bot: object, embed: object, author_id: int, choices: list):
         self.bot = bot
         self.choices = choices
         self.embed = embed.copy()
-        self.colour = ('yellow', 'green', 'purple', 'brown', 'red', 'blue', 'orange', 'white_large', 'black_large')
-        self.poll_author_id = author.id
-        self.que = que
-        self.votes = self.voted = []
+        self.poll_author_id = author_id
+        self.voted = []
         self.votes = [0 for i in range(len(choices))]
 
     @classmethod
-    def mk_poll_embed(cls, bot, author, que, choices):
-        embed = Embed(title = que, color = 0xffff00)
+    def mk_poll_embed(cls, bot: object, author: object, que: str, choices: list) -> classmethod:
+        embed = Embed(title=que, color=0xffff00)
 
         for number, choice in zip(NUMBERS, choices):
             embed.add_field(name=f":{number}:  {choice}\n", value=f"0 votes: 0%", inline=False)
         embed.set_author(name=author.name, icon_url=author.avatar_url)
 
-        return cls(bot, embed, author, que, choices)
+        return cls(bot, embed, author.id, choices)
 
-    def edit_embed(self, most_voter=False):
+    def edit_embed(self, most_voter: bool=False) -> object:
         self.embed.clear_fields()
         i = 0
         max_votes = max(self.votes)
-        for number, choice, col in zip(NUMBERS, self.choices, self.colour):
+        for number, choice, col in zip(NUMBERS, self.choices, COLORS):
             v_cnt = self.votes[i]
             v_pnt = int(v_cnt / sum(self.votes) * 100)
 
@@ -50,15 +47,19 @@ class PollEmbed(object):
 
         return self.embed
 
-    async def wait_poll(self, msg):
-        [await msg.add_reaction(r) for r in KEYCAP[:len(self.votes)]]
-        await msg.add_reaction("🔚")
+    async def add_react(self, msg: object) -> None:
+        try:
+            [await msg.add_reaction(r) for r in KEYCAP[:len(self.votes)]]
+            await msg.add_reaction("🔚")
+        except KeyError: ...
 
-        def react_check(reaction, user):
-            if reaction.message.id != msg.id or user.bot:
-                return
-            if (emoji := str(reaction.emoji)) in KEYCAP or emoji == "🔚":
-                return True
+    async def wait_poll(self, msg: object) -> None:
+        await self.add_react(msg)
+
+        def react_check(r: object, u: object) -> bool:
+            if r.message.id != msg.id or u.bot:
+                return False
+            return str(r.emoji) in KEYCAP or emoji == "🔚"
 
         while True:
             try:
@@ -75,11 +76,7 @@ class PollEmbed(object):
                 self.votes[KEYCAP.index(emoji)] += 1
                 await msg.edit(embed=self.edit_embed())
 
-            try:
-                [await msg.add_reaction(r) for r in KEYCAP[:len(self.votes)]]
-                await msg.add_reaction("🔚")
-            except KeyError:
-                pass
+            await self.add_react(msg)
 
         await msg.clear_reactions()
         self.embed.title += ": 投票終了"
@@ -94,14 +91,16 @@ class Poll(commands.Cog):
 
     # アンケート作成コマンド
     @commands.command()
-    async def poll(self, ctx, que, *choices):
-        if len(choices) > 10:
+    async def poll(self, ctx, que: str, *choices):
+        if len(choices) > 9:
             await ctx.send("選択肢が多すぎます")
             return
         poll_cls = PollEmbed.mk_poll_embed(self.bot, ctx.author, que, choices)
         poll_msg = await self.poll_channel.send(embed=poll_cls.embed)
+
         if ctx.channel.id != self.poll_channel.id:
-            await ctx.send("アンケートチャンネルに \'" + que + "\' を作成しました")
+            c = self.bot.get_channel(self.poll_channel.id)
+            await ctx.send(f"{c.mention} に {que} を作成しました")
 
         await poll_cls.wait_poll(poll_msg)
 

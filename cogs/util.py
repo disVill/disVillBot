@@ -20,7 +20,7 @@ class util(commands.Cog):
         self.bot = bot
         self._last_result = None
 
-    def cleanup_code(self, content: str) -. str:
+    def cleanup_code(self, content: str) -> str:
         # remove ```py\n```
         if content.startswith('```') and content.endswith('```'):
             return '\n'.join(content.split('\n')[1:-1])

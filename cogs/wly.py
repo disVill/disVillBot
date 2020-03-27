@@ -9,6 +9,7 @@ from cogs.config import GuildId, SiteUrls
 config_instance = GuildId()
 ID = config_instance.get_id()
 
+
 class WlyBook:
     def __init__(self):
         self.wly_book_list = {

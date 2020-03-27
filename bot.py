@@ -6,7 +6,7 @@ from discord.ext import commands
 
 from cogs.config import GuildId
 
-(TOKEN, prefix) = GuildId().get_token_and_prefix()
+TOKEN, prefix = GuildId().get_token_and_prefix()
 
 # cog list
 def fetch_extensions():

@@ -9,7 +9,7 @@ from bot import fetch_extensions
 from cogs.config import GuildId
 from cogs.manage import is_developer
 
-(TOKEN, prefix) = GuildId().get_token_and_prefix()
+TOKEN, prefix = GuildId().get_token_and_prefix()
 
 class config(commands.Cog):
     """BOTの設定"""

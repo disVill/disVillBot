@@ -1,16 +1,16 @@
-from   discord.ext import commands
-from   discord     import Embed
-import discord
-
 import asyncio
-import googlesearch
 import random
 import sys
 import traceback
-from   unicodedata import numeric
-import youtube_dl
+from unicodedata import numeric
 
-from   .manage     import is_developer
+import discord
+import googlesearch
+import youtube_dl
+from discord import Embed
+from discord.ext import commands
+
+from .manage import is_developer
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -32,7 +32,6 @@ ffmpeg_options = {
     'options': '-vn'
 }
 
-# ffmpeg_path = r"C:\Program Files\ffmpeg-20191109-bb190de-win64-static\bin\ffmpeg.exe"
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
@@ -55,11 +54,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), data=data)
-        # executable=ffmpeg_path
 
 class music(commands.Cog):
     def __init__(self, bot):
-        self.bot   = bot
+        self.bot = bot
         self.voice = None
         self.playing_music = None
 
@@ -69,21 +67,20 @@ class music(commands.Cog):
                 [await msg.add_reaction(r) for r in ("⏸", "⏹")]
             elif self.voice.is_paused():
                 [await msg.add_reaction(r) for r in ("▶", "⏹")]
-        except KeyError: ...
+        except discord.HTTPException: ...
 
     async def m_player(self, user_id: int, msg: object) -> None:
         await self.add_react(msg)
 
         def react_check(r: object, u: object) -> bool:
             if u.id != user_id or r.message.id != msg.id:
-                return False
+                return
             return str(r.emoji) in ("▶", "⏹", "⏸")
 
         while self.voice.is_playing() or self.voice.is_paused():
             try:
                 reaction, _ = await self.bot.wait_for('reaction_add',check=react_check, timeout=30)
-            except asyncio.TimeoutError:
-                continue
+            except asyncio.TimeoutError: continue
 
             if (emoji := str(reaction.emoji)) == "⏸" and not self.voice.is_paused():
                 self.voice.pause()
@@ -103,8 +100,7 @@ class music(commands.Cog):
     async def play(self, ctx, *, url):
         if (self.voice is None) or (not self.voice.is_connected()):
             if ctx.author.voice is None:
-                await ctx.send('ボイスチャンネルに接続してください')
-                return
+                return await ctx.send('ボイスチャンネルに接続してください')
             await ctx.invoke(self.summon)
 
         async with ctx.typing():
@@ -126,14 +122,12 @@ class music(commands.Cog):
         try:
             await ctx.send('ボイスチャンネルへ接続します')
             self.voice = await ctx.author.voice.channel.connect()
-
         except Exception as e:
             fmt = 'エラー ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
             await ctx.send(fmt.format(type(e).__name__, e))
             print(f'Failed to connect voic3 channel', file=sys.stderr)
             traceback.print_exc()
             print('-----')
-            return
 
     # 曲の一時停止
     @commands.command(enabled=is_enabled)

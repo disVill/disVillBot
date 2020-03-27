@@ -1,8 +1,8 @@
-from   discord.ext import commands
-from   discord     import Embed
-import discord
-
 import asyncio
+
+import discord
+from discord import Embed
+from discord.ext import commands
 
 
 class BotHelp(commands.Cog):
@@ -48,16 +48,14 @@ class BotHelp(commands.Cog):
     async def add_react(self, msg: object, max_page: int, page: int = 1) -> None:
         try:
             if page == 1:
-                [await msg.add_reaction(r) for r in ("▶", "⏩")]
-            elif page >= max_page:
-                [await msg.add_reaction(r) for r in ("⏪", "◀")]
-            else:
-                [await msg.add_reaction(r) for r in ("⏪", "◀", "▶", "⏩")]
-        except KeyError: ...
+                return [await msg.add_reaction(r) for r in ("▶", "⏩")]
+            if page >= max_page:
+                return [await msg.add_reaction(r) for r in ("⏪", "◀")]
+            [await msg.add_reaction(r) for r in ("⏪", "◀", "▶", "⏩")]
+        except discord.HTTPException: ...
 
     @commands.command()
-    async def help(self, ctx, per_page: int = 4):
-        page = 1
+    async def help(self, ctx, per_page: int=4, page: int=1):
         msg = await ctx.send(embed=self.get_help_embed(page, per_page))
         max_page = len(self.cmd_list) // per_page + 1 if len(self.cmd_list) % per_page else 0
         await self.add_react(msg, max_page)
@@ -71,8 +69,7 @@ class BotHelp(commands.Cog):
             try:
                 reaction, _ = await self.bot.wait_for('reaction_add',check=react_check, timeout=180)
             except asyncio.TimeoutError:
-                await msg.clear_reactions()
-                return
+                return await msg.clear_reactions()
 
             if (emoji := str(reaction.emoji)) == "▶" and page < max_page:
                 page += 1
@@ -88,7 +85,7 @@ class BotHelp(commands.Cog):
     @commands.command(hideen=True)
     async def what_is_new(self, ctx):
         embed = Embed(
-            description='BOTの更新 v1.2.8/nアンケート機能の仕様変更',
+            description='BOTの更新 v1.2.9/nコードのリファクタリング',
             color=0x00ffff,
         )
         await ctx.send(embed=embed)

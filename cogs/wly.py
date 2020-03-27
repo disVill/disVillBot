@@ -1,10 +1,10 @@
-from   discord.ext import tasks, commands
-from   discord     import Embed
-import discord
-
 import datetime
 
-from   .config     import SiteUrls, GuildId
+import discord
+from discord import Embed
+from discord.ext import commands, tasks
+
+from cogs.config import GuildId, SiteUrls
 
 config_instance = GuildId()
 ID = config_instance.get_id()
@@ -12,11 +12,11 @@ ID = config_instance.get_id()
 class WlyBook:
     def __init__(self):
         self.wly_book_list = {
-            '00/00': '00/00() 00:00-00:00',
+            # '00/00': '00/00() 00:00-00:00',
         }
 
     def get_wly_book_list(self):
-        return self.wly_book_list or {'00/00': '予約はありません 00:00'}
+        return self.wly_book_list or {'00/00': '予約はありません :timer:'}
 
 
 class WorkLabYatsugatake(commands.Cog):
@@ -32,9 +32,9 @@ class WorkLabYatsugatake(commands.Cog):
             list_text += f"{day}\n"
 
         embed = Embed(
-            title       = 'ワークラボの予約',
+            title = 'ワークラボの予約',
             description = list_text,
-            color       = 0x00ffff,
+            color = 0x00ffff,
         )
         return  embed
 
@@ -47,15 +47,11 @@ class WorkLabYatsugatake(commands.Cog):
                 channel = self.bot.get_channel(id=ID['channel']['chat'])
                 await channel.send(f'@everyone\n今日はワークラボの予約日です\n{time.split().pop(1)}')
 
-    @commands.group()
+    @commands.command()
     async def wly(self, ctx, *args):
         if ctx.invoked_subcommand is None:
             embed = self.book_list_embed()
             await ctx.send(embed = embed)
-
-    @wly.group()
-    async def site(self, ctx):
-        await ctx.send(SiteUrls.url['wly'])
 
 
 def setup(bot):

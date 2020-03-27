@@ -1,45 +1,27 @@
-from discord.ext   import commands
-from discord       import Embed
 import discord
+from discord import Embed
+from discord.ext import commands
+from googlesearch import search
 
-from googlesearch  import search
 from googletrans import Translator
 
 
 class Google(commands.Cog):
-    """
-    google関係
-    """
-
+    """google関係"""
     def __init__(self, bot):
         self.bot = bot
 
-    # 引数に入れた単語をgoogleで検索
-    @commands.group()
-    async def google(self, ctx):
-        if ctx.invoked_subcommand is None:
-            keyword = ' '.join(ctx.message.content.split()[1:])
-            print(f'google search log: {keyword}')
+    # 引数に入ったキーワードをgoogleで検索
+    @commands.command()
+    async def google(self, ctx, *, keyword):
+        url = search(keyword, lang='jp', num=1).__next__()
+        await ctx.send(url)
 
-            url = search(keyword, lang='jp', num=1).__next__()
-            await ctx.send(url)
-
-    # google検索のヘルプ
-    @google.group(name='--help')
-    async def google_help(self, ctx):
-        embed = Embed(
-            title       = 'google search',
-            description = '!google [serach keywords]',
-            color       = 0x00ffff,
-        )
-
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['googletrans', 'googletranslate', 'trans'])
+    # 引数に入ったキーワードをgoogle翻訳で日本語へ翻訳する
+    @commands.command(aliases=['googletrans', 'googleTrans', 'googletranslate', 'trans'])
     async def translate(self, ctx, *, text):
-        translator = Translator()
         dest = 'ja'
-        translated = translator.translate(text, dest=dest)
+        translated = Translator().translate(text, dest=dest)
         await ctx.send(f"From: **{translated.src}**, To: **{dest}**\n{translated.text}")
 
 

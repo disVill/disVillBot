@@ -4,4 +4,4 @@
 
 __title__ = 'discord'
 __author__ = 'disVill'
-__version__ = '1.2.5'
+__version__ = '1.2.9'

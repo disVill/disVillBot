@@ -1,16 +1,15 @@
-from   discord.ext import commands
-import discord
-
 import datetime
 import os
 import sys
 
-from   bot         import fetch_extensions
-from   .manage     import is_developer
-from   .config     import GuildId
+import discord
+from discord.ext import commands
 
-config_instance  = GuildId()
-(TOKEN, prefix) = config_instance.get_token_and_prefix()
+from bot import fetch_extensions
+from cogs.config import GuildId
+from cogs.manage import is_developer
+
+(TOKEN, prefix) = GuildId().get_token_and_prefix()
 
 class config(commands.Cog):
     """BOTの設定"""
@@ -18,27 +17,27 @@ class config(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @commands.has_permissions(manage_guild=True)
     async def activity_init(self, ctx):
         activity = discord.Activity(
             name='ご注文はうさぎですか？',
             url='http://www.dokidokivisual.com/',
             type=discord.ActivityType.watching,
             state='In front of TV',
-            details='カフェラテ・カフェモカ・カプチーノ！',
+            details='カフェラテ・カフェモカ・カプチーノ',
             start=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))),
             large_image_url='https://gochiusa.com/01/core_sys/images/main/logo.png',
             large_image_text='Is the Order a Rabbit?',
             )
         await self.bot.change_presence(status=discord.Status.online, activity=activity)
 
-    # BOTのアクティビティを変更
+    # change bot's activity
     @commands.command()
     @commands.has_permissions(manage_guild=True)
     async def activity(self, ctx, *args):
         activity = discord.Activity(name=' '.join(args), type=discord.ActivityType.watching)
         await self.bot.change_presence(status=discord.Status.online, activity=activity)
 
-    # BOTの再起動
     @commands.command()
     @is_developer()
     async def restart(self, ctx):
@@ -49,18 +48,17 @@ class config(commands.Cog):
         await self.bot.login(token=TOKEN, bot=True)
         await self.bot.connect()
 
-    # BOTをシャットダウンする
     @commands.command()
     @is_developer()
     async def shutdown(self, ctx, Option: str=""):
         if Option != '-q':
             def check(m: object) -> bool:
                 return m.channel.id == ctx.channel.id and m.author.id == ctx.author.id
-
             await ctx.send('シャットダウンします\n続行するには [y] を送信してください')
             msg = await self.bot.wait_for('message', check=check)
             if not (msg.content in ['y', 'Y']):
                 return
+
         await ctx.send('ﾉｼ')
         await self.bot.logout()
 

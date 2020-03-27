@@ -1,20 +1,28 @@
 import os
 
-
-class BotAuth:
-    bot_token      = '' or os.environ.get('TOKEN')
-    dammy_token    = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken'
-    command_prefix = ''
+BOT_TOKEN = ''
+DAMMY_TOKEN = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken' # 偽トークン
+COMMAND_PREFIX = '!'
 
 class SiteUrls:
-    url = {
-        'wly': 'https://wly.jp/',
-    }
+    def __init__(self):
+        self.github_url = "https://github.com/disVill/disVillBot"
+        self.shinonome_twitter_url = "https://twitter.com/pgsus_info"
+        self.wly_url = "https://wly.jp/"
+
+    def get_shinonome_twitter_url(self):
+        return self.shinonome_twitter_url
+
+    def get_github_url(self):
+        return self.github_url
+
+    def get_wly_url(self):
+        return self.wly_url
 
 class GuildId:
     def __init__(self):
-        self.token  = BotAuth.bot_token
-        self.prefix = BotAuth.command_prefix or '!'
+        self.token = BOT_TOKEN or os.environ.get('TOKEN')
+        self.prefix = COMMAND_PREFIX or '!'
         self.id_list = {
             'user': {
                 'develop' : 578507026943049728,
@@ -40,7 +48,6 @@ class GuildId:
                 'program' : 627472578642051072,
             },
             'guild': {
-                'bot'     : 588305013072461844,
                 'suwarika': 626401720053792768,
             },
         }
@@ -59,12 +66,11 @@ class GuildId:
 
     def get_token_and_prefix(self):
         if self.token is None or len(self.token) != 59:
-            return os.environ.get('TOKEN'), self.prefix
-        else:
-            return self.token, self.prefix
+            return DAMMY_TOKEN, self.prefix
+        return self.token, self.prefix
 
     def get_id(self):
         return self.id_list
 
     def get_keycap(self):
-        return keycap_list
+        return self.keycap_list

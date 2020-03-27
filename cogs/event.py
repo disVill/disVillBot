@@ -1,15 +1,14 @@
-from   discord.ext  import commands
-from   discord      import Embed
-import discord
-
 import datetime
 import sys
 import traceback
 
-from   .config      import GuildId
+import discord
+from discord import Embed
+from discord.ext import commands
 
-config_instance = GuildId()
-ID = config_instance.get_id()
+from cogs.config import GuildId
+
+ID = GuildId().get_id()
 
 class event(commands.Cog):
     def __init__(self, bot):

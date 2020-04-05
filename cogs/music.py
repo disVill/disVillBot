@@ -220,6 +220,9 @@ class music(commands.Cog):
         await self.voice.disconnect()
         self.voice = None
 
+    @commands.command()
+    async def eval_m(self, ctx, *, form):
+        ctx.send(eval(form))
 
 def setup(bot):
     bot.add_cog(music(bot))

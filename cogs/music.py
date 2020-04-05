@@ -156,9 +156,9 @@ class music(commands.Cog):
             await ctx.send('ボイスチャンネルへ接続します')
             self.voice = await ctx.author.voice.channel.connect()
         except Exception as e:
-            fmt = 'エラー ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
+            fmt = 'ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
             await ctx.send(fmt.format(type(e).__name__, e))
-            print(f'Failed to connect voic3 channel', file=sys.stderr)
+            print(f'Failed to connect voice channel', file=sys.stderr)
             traceback.print_exc()
             print('-----')
 
@@ -180,14 +180,20 @@ class music(commands.Cog):
     @commands.command(enabled=is_enabled)
     async def playing(self, ctx):
         if self.voice.is_playing or self.voice.is_paused():
-            return await ctx.send(f"'{self.playing_music}' が再生されています")
+            embed = Embed(
+                title='再生中の曲',
+                color=0x00bfff,
+                description=f'{self.playing_music}'
+            )
+            return await ctx.send(embed=embed)
         await ctx.send('再生されている曲はありません')
 
+    # キューに入っている曲の確認
     @commands.command(name='queue', enabled=is_enabled)
     async def queue_(self, ctx):
         song_list = ''
         for i, p in enumerate(self.songs._queue):
-            song_list += f"{i + 1}) [{p.title}]({p.url}): {p.creator}\n"
+            song_list += f"{i + 1}) [{p.title}]({p.url})\n"
         await ctx.send(song_list)
 
     # 曲の停止

@@ -115,7 +115,7 @@ class music(commands.Cog):
 
             embed = Embed(
                 title="再生中",
-                color=0x0000ff,
+                color=0x00bfff,
                 description=f"[{player.title}]({player.url})"
             )
             msg = await bot_ch.send(embed=embed)
@@ -141,7 +141,7 @@ class music(commands.Cog):
         if not self.songs.empty():
             embed = Embed(
                 description=f"キューに追加: [{player.title}]({player.url})",
-                color=0x0000ff,
+                color=0x00bfff,
             )
             await ctx.send(embed=embed)
         await self.songs.put(player)
@@ -186,8 +186,8 @@ class music(commands.Cog):
     @commands.command(name='queue', enabled=is_enabled)
     async def queue_(self, ctx):
         song_list = ''
-        for i, player in enumerate(self.songs._queue):
-            song_list += f"{i + 1}) {player.title}: {player.creater}\n"
+        for i, p in enumerate(self.songs._queue):
+            song_list += f"{i + 1}) [{p.title}]({p.url}): {p.creator}\n"
         await ctx.send(song_list)
 
     # 曲の停止

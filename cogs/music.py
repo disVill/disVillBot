@@ -108,17 +108,18 @@ class music(commands.Cog):
             self.play_next.clear()
 
             bot_ch = self.bot.get_channel(id=self.bot_ch_id)
+
             player = await self.songs.get()
-            if plyaer:
-                self.voice.play(player, after=self.toggle_next)
-                self.playing_music = player.title
-                embed = Embed(
-                    title="再生中",
-                    color=0x0000ff,
-                    description=f"[{player.title}]({player.url})"
-                )
-                msg = await bot_ch.send(embed=embed)
-                await self.m_player(msg)
+            self.voice.play(player, after=self.toggle_next)
+            self.playing_music = player.title
+
+            embed = Embed(
+                title="再生中",
+                color=0x0000ff,
+                description=f"[{player.title}]({player.url})"
+            )
+            msg = await bot_ch.send(embed=embed)
+            await self.m_player(msg)
 
             await self.play_next.wait()
 

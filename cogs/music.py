@@ -222,7 +222,7 @@ class music(commands.Cog):
 
     @commands.command()
     async def eval_m(self, ctx, *, form):
-        ctx.send(eval(form))
+        await ctx.send(eval(form))
 
 def setup(bot):
     bot.add_cog(music(bot))

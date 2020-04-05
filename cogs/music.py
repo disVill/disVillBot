@@ -108,8 +108,8 @@ class music(commands.Cog):
             self.play_next.clear()
 
             bot_ch = self.bot.get_channel(id=self.bot_ch_id)
-            url = await self.songs.get()
-            if url:
+            player = await self.songs.get()
+            if plyaer:
                 self.voice.play(player, after=self.toggle_next)
                 self.playing_music = player.title
                 embed = Embed(
@@ -132,9 +132,11 @@ class music(commands.Cog):
 
         if not url.startswith("https://www.youtube.com/watch?v="):
             url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
+
         player = await YTDLSource.from_url(url, loop=self.bot.loop)
         if player is None:
             return await ctx.send("曲のダウンロードに失敗しました")
+
         if not self.songs.empty():
             embed = Embed(
                 description=f"キューに追加: [{player.title}]({player.url})",

@@ -116,7 +116,7 @@ class music(commands.Cog):
             embed = Embed(
                 title="再生中",
                 color=0x00bfff,
-                description=f"[{player.title}]({player.url})"
+                description=f"{player.title}"
             )
             msg = await bot_ch.send(embed=embed)
             await self.m_player(msg)

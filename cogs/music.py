@@ -123,7 +123,7 @@ class music(commands.Cog):
 
             await self.play_next.wait()
 
-    # 曲を再生するコマンド
+    # YouTube-URLまたは曲名から曲を再生
     @commands.command(enabled=is_enabled)
     async def play(self, ctx, *, url: str):
         if (self.voice is None) or (not self.voice.is_connected()):

@@ -44,6 +44,10 @@ class event(commands.Cog):
         elif isinstance(error, commands.UserInputError):
             await ctx.send('入力されたコマンドに誤りがあります')
 
+        print(f'Failed to invoke command', file=sys.stderr)
+        traceback.print_exc()
+        print('-' * 30)
+
     # 新しいユーザが入ってきたら通知
     @commands.Cog.listener()
     async def on_member_join(self, new_member):

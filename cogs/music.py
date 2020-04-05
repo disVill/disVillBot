@@ -134,9 +134,13 @@ class music(commands.Cog):
         if not url.startswith("https://www.youtube.com/watch?v="):
             url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
 
-        player = await YTDLSource.from_url(url, loop=self.bot.loop)
-        if player is None:
+        try:
+            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+        except Exception as e:
             return await ctx.send("曲のダウンロードに失敗しました")
+            print(f'Failed to download music', file=sys.stderr)
+            traceback.print_exc()
+            print('-' * 30)
 
         if not self.songs.empty() or self.voice.is_playing() or self.voice.is_paused():
             embed = Embed(
@@ -156,8 +160,7 @@ class music(commands.Cog):
             await ctx.send('ボイスチャンネルへ接続します')
             self.voice = await ctx.author.voice.channel.connect()
         except Exception as e:
-            fmt = 'ボイスチャンネルに接続しているか確認してください： ```py\n{}: {}\n```'
-            await ctx.send(fmt.format(type(e).__name__, e))
+            await ctx.send('ボイスチャンネルに接続できませんでした')
             print(f'Failed to connect voice channel', file=sys.stderr)
             traceback.print_exc()
             print('-----')
@@ -193,11 +196,14 @@ class music(commands.Cog):
     async def queue_(self, ctx):
         song_list = ""
         for i, p in enumerate(self.songs._queue):
-            song_list += f"{i + 2}) {p.title}\n"
+            if len(p.title) > 35:
+                song_list += f"{i + 2}) {p.title[:35]…} {p.duration // 60}:{p.duration % 60:02}\n"
+            else:
+                song_list += f"{i + 2}) {p.title} {p.duration // 60}:{p.duration % 60:02}\n\n"
 
         if not song_list:
             return await ctx.send("キューに追加されている曲はありません")
-        text = f"1) {self.playing_music}\n      ↑ Now playing\n"
+        text = f"1) {self.playing_music[:35]}\n    ↑ Now playing\n"
         await ctx.send(f"```py\n{text}{song_list}```")
 
     # 曲の停止

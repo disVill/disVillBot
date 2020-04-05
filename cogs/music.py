@@ -197,7 +197,7 @@ class music(commands.Cog):
         song_list = ""
         for i, p in enumerate(self.songs._queue):
             if len(p.title) > 35:
-                song_list += f"{i + 2}) {p.title[:35]…} {p.duration // 60}:{p.duration % 60:02}\n"
+                song_list += f"{i + 2}) {p.title[:35]}… {p.duration // 60}:{p.duration % 60:02}\n"
             else:
                 song_list += f"{i + 2}) {p.title} {p.duration // 60}:{p.duration % 60:02}\n\n"
 

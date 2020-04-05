@@ -198,8 +198,7 @@ class music(commands.Cog):
         if not song_list:
             return await ctx.send("キューに追加されている曲はありません")
 
-        song_list += "```py\n" + song_list + "```"
-        await ctx.send(song_list)
+        await ctx.send("```py\n" + song_list + "```")
 
     # 曲の停止
     @commands.command(enabled=is_enabled)

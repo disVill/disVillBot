@@ -129,7 +129,7 @@ class music(commands.Cog):
 
         if not url.startswith("https://www.youtube.com/watch?v="):
             url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
-        await self.songs.put(music_name)
+        await self.songs.put(url)
 
     # ボイスチャンネルにBOTを接続する
     @commands.command(enabled=is_enabled)

@@ -193,12 +193,12 @@ class music(commands.Cog):
     async def queue_(self, ctx):
         song_list = ""
         for i, p in enumerate(self.songs._queue):
-            song_list += f"{i + 1}) {p.title}\n"
+            song_list += f"{i + 2}) {p.title}\n"
 
         if not song_list:
             return await ctx.send("キューに追加されている曲はありません")
-
-        await ctx.send("```py\n" + song_list + "```")
+        text = f"1) {self.playing_music}\n      ↑ Now playing\n"
+        await ctx.send(f"```py\n{text}{song_list}```")
 
     # 曲の停止
     @commands.command(enabled=is_enabled)

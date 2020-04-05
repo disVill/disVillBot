@@ -191,9 +191,10 @@ class music(commands.Cog):
     # キューに入っている曲の確認
     @commands.command(name='queue', enabled=is_enabled)
     async def queue_(self, ctx):
-        song_list = ''
+        song_list = '```py\n'
         for i, p in enumerate(self.songs._queue):
-            song_list += f"```py\n{i + 1}) {p.title}\n```\n"
+            song_list += f"{i + 1}) {p.title}\n"
+        song_list += "```"
         await ctx.send(song_list)
 
     # 曲の停止

@@ -107,13 +107,13 @@ class music(commands.Cog):
         while not self.bot.is_closed():
             self.play_next.clear()
 
-            async with ctx.typing():
+            bot_ch = self.bot.get_channel(id=self.bot_ch_id)
+            async with bot_ch.typing():
                 url = await self.songs.get()
                 player = await YTDLSource.from_url(url, loop=self.bot.loop)
-                self.voice.play(player, after=self.toggle_next)
 
+            self.voice.play(player, after=self.toggle_next)
             self.playing_music = player.title
-            bot_ch = self.bot.get_channel(id=self.bot_ch_id)
             msg = await bot_ch.send(f'Now playing: {player.title}')
             await self.m_player(msg)
 

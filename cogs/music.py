@@ -140,7 +140,7 @@ class music(commands.Cog):
 
         if not self.songs.empty():
             embed = Embed(
-                description=f"キューに追加: [{player.title}]({player.url})",
+                description=f"キューに追加: {player.title}",
                 color=0x00bfff,
             )
             await ctx.send(embed=embed)
@@ -193,7 +193,7 @@ class music(commands.Cog):
     async def queue_(self, ctx):
         song_list = ''
         for i, p in enumerate(self.songs._queue):
-            song_list += f"{i + 1}) [{p.title}]({p.url})\n"
+            song_list += f"```py\n{i + 1}) {p.title}\n```\n"
         await ctx.send(song_list)
 
     # 曲の停止

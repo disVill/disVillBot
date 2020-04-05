@@ -2,36 +2,39 @@ import os
 
 BOT_TOKEN = ''
 DAMMY_TOKEN = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken' # 偽トークン
-COMMAND_PREFIX = '!'
+COMMAND_PREFIX = ''
 
 class SiteUrls:
     def __init__(self):
-        self.github_url = "https://github.com/disVill/disVillBot"
-        self.shinonome_twitter_url = "https://twitter.com/pgsus_info"
-        self.wly_url = "https://wly.jp/"
+        self._github_url = "https://github.com/disVill/disVillBot"
+        self._shinonome_twitter_url = "https://twitter.com/pgsus_info"
+        self._wly_url = "https://wly.jp/"
 
-    def get_shinonome_twitter_url(self):
-        return self.shinonome_twitter_url
+    @property
+    def shinonome_twitter_url(self):
+        return self._shinonome_twitter_url
 
-    def get_github_url(self):
-        return self.github_url
+    @property
+    def github_url(self):
+        return self._github_url
 
-    def get_wly_url(self):
-        return self.wly_url
+    @property
+    def wly_url(self):
+        return self._wly_url
 
 class GuildId:
     def __init__(self):
         self.token = BOT_TOKEN or os.environ.get('TOKEN')
         self.prefix = COMMAND_PREFIX or '!'
-        self.id_list = {
+        self._id_list = {
             'user': {
                 'develop' : 578507026943049728,
             },
             'channel': {
                 'info'    : 626681636716675073,
                 'member'  : 626402047251578880,
-                'logs'    : 659252702890557450,
                 'bot'     : 626401965315719178,
+                'bot2'    : 647656077424590849,
                 'chat'    : 626401720607703053,
                 'poll'    : 627093469722181642,
                 'python'  : 627472625504878612,
@@ -51,7 +54,19 @@ class GuildId:
                 'suwarika': 626401720053792768,
             },
         }
-        self.keycap_list = (
+        self._cog_list = (
+            'cogs.manage',
+            'cogs.util',
+            'cogs.BotConfig',
+            'cogs.PollSystem',
+            'cogs.game',
+            'cogs.music',
+            'cogs.help',
+            'cogs.GoogleSearch',
+            'cogs.wly',
+            'cogs.event',
+        )
+        self._keycap_list = (
             "1\N{combining enclosing keycap}",
             "2\N{combining enclosing keycap}",
             "3\N{combining enclosing keycap}",
@@ -69,8 +84,14 @@ class GuildId:
             return DAMMY_TOKEN, self.prefix
         return self.token, self.prefix
 
-    def get_id(self):
-        return self.id_list
+    @property
+    def id_list(self):
+        return self._id_list
 
-    def get_keycap(self):
-        return self.keycap_list
+    @property
+    def cog_list(self):
+        return self._cog_list
+
+    @property
+    def keycap_list(self):
+        return self._keycap_list

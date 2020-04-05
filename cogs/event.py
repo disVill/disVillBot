@@ -8,28 +8,14 @@ from discord.ext import commands
 
 from cogs.config import GuildId
 
-ID = GuildId().get_id()
+ID = GuildId().id_list
 
 class event(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.logs_channel = self.bot.get_channel(id=ID['channel']['logs'])
+        self.channel_member = self.bot.get_channel(id=ID['channel']['member'])
 
-    @commands.Cog.listener()
-    async def on_message(self, msg):
-        if msg.author.bot:
-            return
-        else:
-            embed = Embed(
-                title = 'Send message',
-                color = 0x98eb34,
-                description=f'{msg.content}',
-                timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-            )
-            embed.set_author(name=msg.author, icon_url=msg.author.avatar_url)
-            embed.set_footer(text=msg.channel.name, icon_url=msg.guild.icon_url)
-            await self.logs_channel.send(embed=embed)
-
+    # エラーが起きたら通知
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.NoPrivateMessage):
@@ -51,35 +37,39 @@ class event(commands.Cog):
 
         elif isinstance(error, commands.ArgumentParsingError):
             await ctx.send(error)
-        print(error)
 
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('コマンドの引数が足りません')
+
+        elif isinstance(error, commands.UserInputError):
+            await ctx.send('入力されたコマンドに誤りがあります')
+
+    # 新しいユーザが入ってきたら通知
     @commands.Cog.listener()
-    async def on_message_delate(self, m):
-        if m.author.bot:
+    async def on_member_join(self, new_member):
+        if new_member.bot:
             return
-        else:
-            time_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-            await self.logs_channel.send(f"**Delate message**\n{m.author}: {m.channel}: {time_now}\n{m.content}")
+        member_role = discord.utils.find(lambda role: role.name == 'member', new_member.guild.roles)
+        member_num = new_member.guild.member_count
+
+        if member_role is not None:
+            await new_member.add_roles(member_role)
+        await self.channel_member.send(
+            f'{new_member.mention}Suwarikaサーバへようこそ\nあなたは{member_num}人目のメンバーです'
+        )
 
     @commands.Cog.listener()
-    async def on_message_edit(self, b, a):
-        if b.author.bot:
-            return
-        else:
-            embed = Embed(
-                title = 'Edit message',
-                color = 0x34abeb,
-                timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-            )
-            embed.add_field(name='before',value=b.content)
-            embed.add_field(name='after',value=a.content)
-            embed.set_author(name=a.author, icon_url=a.author.avatar_url)
-            embed.set_footer(text=a.channel.name, icon_url=a.guild.icon_url)
-            await self.logs_channel.send(embed=embed)
+    async def on_message(self, msg): ...
 
     @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        await self.logs_channel.send(f'**Removed menber**\n{member}')
+    async def on_message_delate(self, msg): ...
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after): ...
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member): ...
+
 
 def setup(bot):
     bot.add_cog(event(bot))

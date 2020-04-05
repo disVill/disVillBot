@@ -11,6 +11,7 @@ from discord import Embed
 from discord.ext import commands
 
 from .manage import is_developer
+from cogs.config import GuildId
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -60,6 +61,10 @@ class music(commands.Cog):
         self.bot = bot
         self.voice = None
         self.playing_music = None
+        self.play_next = asyncio.Event()
+        self.songs = asyncio.Queue()
+        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+        self.bot_ch_id = GuildId().id_list['channel']['bot2']
 
     async def add_react(self, msg: object) -> None:
         try:
@@ -69,49 +74,62 @@ class music(commands.Cog):
                 [await msg.add_reaction(r) for r in ("▶", "⏹")]
         except discord.HTTPException: ...
 
-    async def m_player(self, user_id: int, msg: object) -> None:
-        await self.add_react(msg)
+    async def m_player(self, msg: object) -> None:
+        def check(r: object, u: object) -> bool:
+            if r.message.id == msg.id:
+                return str(r.emoji) in ("▶", "⏹", "⏸")
 
-        def react_check(r: object, u: object) -> bool:
-            if u.id != user_id or r.message.id != msg.id:
-                return
-            return str(r.emoji) in ("▶", "⏹", "⏸")
+        await self.add_react(msg)
 
         while self.voice.is_playing() or self.voice.is_paused():
             try:
-                reaction, _ = await self.bot.wait_for('reaction_add',check=react_check, timeout=30)
+                react, _ = await self.bot.wait_for('reaction_add',check=check, timeout=30)
             except asyncio.TimeoutError: continue
 
-            if (emoji := str(reaction.emoji)) == "⏸" and not self.voice.is_paused():
+            if (emoji := str(react.emoji)) == "⏸" and not self.voice.is_paused():
                 self.voice.pause()
             elif emoji == "▶" and self.voice.is_paused():
                 self.voice.resume()
             elif emoji == "⏹":
                 self.voice.stop()
                 break
-            await msg.clear_reactions()
 
+            await msg.clear_reactions()
             await self.add_react(msg)
 
         await msg.clear_reactions()
 
+    def toggle_next(self, error):
+        self.bot.loop.call_soon_threadsafe(self.play_next.set)
+        print('error check:' + error)
+
+    async def audio_player_task(self):
+        while not self.bot.is_closed():
+            self.play_next.clear()
+
+            async with ctx.typing():
+                url = await self.songs.get()
+                player = await YTDLSource.from_url(url, loop=self.bot.loop)
+                self.voice.play(player, after=self.toggle_next)
+
+            self.playing_music = player.title
+            bot_ch = self.bot.get_channel(id=self.bot_ch_id)
+            msg = await bot_ch.send(f'Now playing: {player.title}')
+            await self.m_player(msg)
+
+            await self.play_next.wait()
+
     # 曲を再生するコマンド
     @commands.command(enabled=is_enabled)
-    async def play(self, ctx, *, url):
+    async def play(self, ctx, *, url: str):
         if (self.voice is None) or (not self.voice.is_connected()):
             if ctx.author.voice is None:
                 return await ctx.send('ボイスチャンネルに接続してください')
             await ctx.invoke(self.summon)
 
-        async with ctx.typing():
-            if not url.startswith("https://www.youtube.com/watch?v="):
-                url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
-            player = await YTDLSource.from_url(url, loop=self.bot.loop)
-            self.voice.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-
-        msg = await ctx.send('Now playing: {}'.format(player.title))
-        self.playing_music = player.title
-        await self.m_player(ctx.author.id, msg)
+        if not url.startswith("https://www.youtube.com/watch?v="):
+            url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
+        await self.songs.put(music_name)
 
     # ボイスチャンネルにBOTを接続する
     @commands.command(enabled=is_enabled)
@@ -133,33 +151,29 @@ class music(commands.Cog):
     @commands.command(enabled=is_enabled)
     async def pause(self, ctx):
         if self.voice.is_playing():
-            self.voice.pause()
-        else:
-            await ctx.send('曲が再生されていません')
+            return self.voice.pause()
+        await ctx.send('曲が再生されていません')
 
     # 曲の一時停止を解除
     @commands.command(enabled=is_enabled)
     async def resume(self, ctx):
         if self.voice.is_paused():
-            self.voice.resume()
-        else:
-            await ctx.send('一時停止されている曲はありません')
+            return self.voice.resume()
+        await ctx.send('一時停止されている曲はありません')
 
     # 再生されている曲の名前確認
     @commands.command(enabled=is_enabled)
     async def playing(self, ctx):
         if self.voice.is_playing or self.voice.is_paused():
-            await ctx.send(f"'{self.playing_music}' が再生されています")
-        else:
-            await ctx.send('再生されている曲はありません')
+            return await ctx.send(f"'{self.playing_music}' が再生されています")
+        await ctx.send('再生されている曲はありません')
 
-    # プレイリストの次の曲を再生
+    # 曲の停止
     @commands.command(enabled=is_enabled)
     async def stop(self, ctx):
         if self.voice.is_playing():
-            self.voice.stop()
-        else:
-            await ctx.send('曲が再生されていません')
+            return self.voice.stop()
+        await ctx.send('曲が再生されていません')
 
     # ボイスチャンネルからBOTを退出
     @commands.command(enabled=is_enabled)
@@ -168,18 +182,6 @@ class music(commands.Cog):
         await self.voice.disconnect()
         self.voice = None
 
-    # eval
-    @commands.command(name='eval_m', enabled=is_enabled)
-    @is_developer()
-    async def evaluation_music(self, ctx, *args):
-        x = eval(str(' '.join(args)))
-        await ctx.send(x)
-
-    # exec
-    @commands.command(name='exec_m', enabled=is_enabled)
-    @is_developer()
-    async def execution_music(self, ctx, *args):
-        exec(str(' '.join(args)))
 
 def setup(bot):
     bot.add_cog(music(bot))

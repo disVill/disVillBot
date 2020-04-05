@@ -5,7 +5,6 @@ from discord import Embed
 from discord.ext import commands
 
 KEYCAP = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
-NUMBERS = ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine')
 COLORS = ('yellow', 'green', 'purple', 'brown', 'red', 'blue', 'orange', 'white_large', 'black_large')
 
 
@@ -22,8 +21,8 @@ class PollEmbed(object):
     def mk_poll_embed(cls, bot: object, author: object, que: str, choices: tuple) -> classmethod:
         embed = Embed(title=que, color=0xffff00)
 
-        for number, choice in zip(NUMBERS, choices):
-            embed.add_field(name=f":{number}:  {choice}\n", value=f"0 votes: 0%", inline=False)
+        for keycap, choice in zip(KEYCAP, choices):
+            embed.add_field(name=f"{keycap}  {choice}\n", value=f"0 votes: 0%", inline=False)
         embed.set_author(name=author.name, icon_url=author.avatar_url)
 
         return cls(bot, embed, author.id, choices)
@@ -32,13 +31,13 @@ class PollEmbed(object):
         self.embed.clear_fields()
         max_votes = max(self.votes)
 
-        for v_cnt, number, choice, col in zip(self.votes, NUMBERS, self.choices, COLORS):
+        for v_cnt, keycap, choice, col in zip(self.votes, KEYCAP, self.choices, COLORS):
             v_sum = sum(self.votes) or 1
             v_pnt = int(v_cnt / v_sum * 100)
             value = f"{v_cnt} votes: {v_pnt}% \n" + f":{col}_square:" * (v_pnt // 10)
             if most_voter and v_cnt >= max_votes:
                 value += ":white_flower:"
-            self.embed.add_field(name=f":{number}: {choice}\n", value=value, inline=False)
+            self.embed.add_field(name=f"{keycap}: {choice}\n", value=value, inline=False)
 
         return self.embed
 
@@ -52,9 +51,8 @@ class PollEmbed(object):
         await self.add_react(msg)
 
         def react_check(r: object, u: object) -> bool:
-            if r.message.id != msg.id or u.bot:
-                return False
-            return (emoji := str(r.emoji)) in KEYCAP or emoji == "🔚"
+            if r.message.id == msg.id or not u.bot:
+                return (emoji := str(r.emoji)) in KEYCAP or emoji == "🔚"
 
         while not self.bot.is_closed():
             reaction, user = await self.bot.wait_for('reaction_add',check=react_check)
@@ -81,7 +79,7 @@ class Poll(commands.Cog):
 
     # アンケート作成コマンド
     @commands.command()
-    async def poll(self, ctx, que: str, *choices: tuple):
+    async def poll(self, ctx, que: str, *choices: str):
         if len(choices) > 9:
             return await ctx.send("選択肢が多すぎます")
         poll_cls = PollEmbed.mk_poll_embed(self.bot, ctx.author, que, choices)

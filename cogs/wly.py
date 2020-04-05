@@ -6,26 +6,15 @@ from discord.ext import commands, tasks
 
 from cogs.config import GuildId, SiteUrls
 
-config_instance = GuildId()
-ID = config_instance.get_id()
-
-
-class WlyBook:
-    def __init__(self):
-        self.wly_book_list = {
-            # '00/00': '00/00() 00:00-00:00',
-        }
-
-    def get_wly_book_list(self):
-        return self.wly_book_list or {'00/00': '予約はありません :timer:'}
-
+ID = GuildId().id_list
 
 class WorkLabYatsugatake(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.notice_loop.start()
-        self.wly_instance = WlyBook()
-        self.wly_book_list = self.wly_instance.get_wly_book_list()
+        self.wly_book_list = {
+            # '00/00': '00/00() 00:00-00:00',
+        }
 
     def book_list_embed(self):
         list_text = ""
@@ -50,9 +39,8 @@ class WorkLabYatsugatake(commands.Cog):
 
     @commands.command()
     async def wly(self, ctx, *args):
-        if ctx.invoked_subcommand is None:
-            embed = self.book_list_embed()
-            await ctx.send(embed = embed)
+        embed = self.book_list_embed()
+        await ctx.send(embed = embed)
 
 
 def setup(bot):

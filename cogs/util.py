@@ -1,12 +1,12 @@
 import asyncio
 import copy
-import datetime
 import io
 import random
 import re
 import textwrap
 import time
 import traceback
+from datetime import datetime, timezone, timedelta
 from contextlib import redirect_stdout
 
 import discord
@@ -46,30 +46,9 @@ class util(commands.Cog):
         text = f'このサーバーには{arg}人のメンバーがいます'
         await ctx.send(text)
 
-    # change channel name
-    @commands.command()
-    @is_developer()
-    async def name(self, ctx, *, channel_name: str):
-        await ctx.channel.edit(name=channel_name)
-
-    # change channel topic
-    @commands.command()
-    @is_developer()
-    async def topic(self, ctx, *, channel_topic: str):
-        await ctx.channel.edit(topic=channel_topic)
-
-    # make new channel
-    @commands.command()
-    @is_developer()
-    async def mkch(self, ctx, *, ch_name):
-        category_id = ctx.channel.category_id
-        category = ctx.guild.get_channel(category_id)
-        await category.create_text_channel(name=ch_name)
-        await ctx.send(f"新しいチャンネル'{ch_name}'を作りました")
-
     # react custom emoji
     @commands.command()
-    async def emoji(self, ctx, *emoji_names: tuple):
+    async def emoji(self, ctx, *emoji_names: str):
         if not emoji_names:
             await ctx.send('Custom Emojiの名前を入力してください')
 
@@ -104,62 +83,55 @@ class util(commands.Cog):
         await ctx.send(text)
 
     @commands.command()
-    async def timer(self, ctx, time, *msg):
+    async def timer(self, ctx, time, *, msg=''):
         times = re.findall(r'\d+', time)
         units = re.findall(r'[h,m,s]', time)
 
         if len(times) != len(units):
-            await ctx.send('時間指定の方法が誤っています')
-            return
+            return await ctx.send('時間指定の方法が誤っています')
 
-        seconds = 0
-        text = ''
+        sec = 0
+        for t, u in zip(times, units):
+            if u == 'h':
+                sec += 3600 * int(t)
+            elif u == 'm':
+                sec += 60 * int(t)
+            elif u == 's':
+                sec += int(t)
 
-        if times and units:
-            for t, u in zip(times, units):
-                if u == 'h':
-                    seconds += 3600 * int(t)
-                elif u == 'm':
-                    seconds += 60 * int(t)
-                elif u == 's':
-                    seconds += int(t)
-
-        if seconds > 65535:
+        if sec > 65535:
             return await ctx.send('時間が長すぎます')
 
-        if seconds // 3600:
-            text += f'{seconds//3600}時間'
-        if seconds % 3600 // 60:
-            text += f'{seconds%3600//60}分'
-        if seconds % 3600 % 60:
-            text += f'{seconds%3600%60}秒'
+        m, s = divmod(sec, 60)
+        h, m = divmod(m, 60)
+        text = f'{h}時間{m:2}分{s:2}秒'
 
         await ctx.send(f'タイマーを{text}に設定しました:timer:')
-        await asyncio.sleep(seconds)
+        await asyncio.sleep(sec)
 
-        fin_txt = f"{ctx.author.mention} {' '.join(msg) if msg else f'{text}が経過しました'}:timer:"
+        fin_txt = f"{ctx.author.mention} {msg if msg else f'{text}が経過しました'}:timer:"
         await ctx.send(fin_txt)
 
     @commands.command()
     async def time(self, ctx):
-        time_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+        time_now = datetime.now(timezone(timedelta(hours=9)))
         await ctx.send(time_now)
 
     @commands.command()
-    async def echo(self, ctx):
-        await ctx.send(ctx.message.content[6:])
+    async def echo(self, ctx, *, txt):
+        await ctx.send(txt)
 
     @commands.command()
     async def ping(self, ctx):
         await ctx.send('pong')
 
-    @commands.command(aliases=['latency'])
+    @commands.command(name='latency')
     async def latency_(self, ctx):
         await ctx.send(f'{int(self.bot.latency * 1000)}[ms]')
 
     @commands.command(aliases=['git', 'source', 'code', 'sourcecode'])
     async def github(self, ctx):
-        await ctx.send(SiteUrls().get_github_url())
+        await ctx.send(SiteUrls().github_url)
 
     @commands.command(pass_context=True, name='eval')
     async def eval_(self, ctx, *, body: str):
@@ -180,7 +152,7 @@ class util(commands.Cog):
         to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
 
         try:
-            # HACK: too long
+            # HACK: 見ろ、コードがゴミのようだ
             exec(to_compile, {'__builtins__':{
                 'print':print,'abs':abs,'bool':bool,'dict':dict,'dir':dir,'divmod':divmod,'format':format,'enumarate':enumerate,
                 'float':float,'getattr':getattr,'hasattr':hasattr,'hex':hex,'int':int,'input':input,'len':len,'list':list,'map':map,

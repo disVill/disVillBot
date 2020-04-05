@@ -76,7 +76,7 @@ class music(commands.Cog):
 
     async def m_player(self, msg: object) -> None:
         def check(r: object, u: object) -> bool:
-            if r.message.id == msg.id:
+            if r.message.id == msg.id and not u.bot:
                 return str(r.emoji) in ("▶", "⏹", "⏸")
 
         await self.add_react(msg)
@@ -108,14 +108,14 @@ class music(commands.Cog):
             self.play_next.clear()
 
             bot_ch = self.bot.get_channel(id=self.bot_ch_id)
-            async with bot_ch.typing():
-                url = await self.songs.get()
-                player = await YTDLSource.from_url(url, loop=self.bot.loop)
-
-            self.voice.play(player, after=self.toggle_next)
-            self.playing_music = player.title
-            msg = await bot_ch.send(f'Now playing: {player.title}')
-            await self.m_player(msg)
+            url = await self.songs.get()
+            if url:
+                async with bot_ch.typing():
+                    player = await YTDLSource.from_url(url, loop=self.bot.loop)
+                self.voice.play(player, after=self.toggle_next)
+                self.playing_music = player.title
+                msg = await bot_ch.send(f'Now playing: {player.title}')
+                await self.m_player(msg)
 
             await self.play_next.wait()
 

@@ -198,13 +198,11 @@ class music(commands.Cog):
     async def queue_(self, ctx):
         song_list = ""
         for i, p in enumerate(self.songs._queue):
-            if len(p.title) > 40:
-                song_list += f"{i + 2}) {p.title[:40]}… {p.duration // 60}:{p.duration % 60:02}\n"
-            else:
-                song_list += f"{i + 2}) {p.title.ljust(40)} {p.duration // 60}:{p.duration % 60:02}\n\n"
+            song_list += f"{i + 2}) {p.title[:40].ljust(40)}  {p.duration // 60:2}:{p.duration % 60:02}\n"
 
         if not song_list:
             return await ctx.send("キューに追加されている曲はありません")
+
         text = f"1) {self.playing_music[:40]}\n    ↑ Now playing\n"
         await ctx.send(f"```py\n{text}{song_list}```")
 

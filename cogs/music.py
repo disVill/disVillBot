@@ -110,11 +110,14 @@ class music(commands.Cog):
             bot_ch = self.bot.get_channel(id=self.bot_ch_id)
             url = await self.songs.get()
             if url:
-                async with bot_ch.typing():
-                    player = await YTDLSource.from_url(url, loop=self.bot.loop)
                 self.voice.play(player, after=self.toggle_next)
                 self.playing_music = player.title
-                msg = await bot_ch.send(f'Now playing: {player.title}')
+                embed = Embed(
+                    title="再生中",
+                    color=0x0000ff,
+                    description=f"[{player.title}]({player.url})"
+                )
+                msg = await bot_ch.send(embed=embed)
                 await self.m_player(msg)
 
             await self.play_next.wait()
@@ -129,7 +132,16 @@ class music(commands.Cog):
 
         if not url.startswith("https://www.youtube.com/watch?v="):
             url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
-        await self.songs.put(url)
+        player = await YTDLSource.from_url(url, loop=self.bot.loop)
+        if player is None:
+            return await ctx.send("曲のダウンロードに失敗しました")
+        if not self.songs.empty():
+            embed = Embed(
+                description=f"キューに追加: [{player.title}]({player.url})",
+                color=0x0000ff,
+            )
+            await ctx.send(embed=embed)
+        await self.songs.put(player)
 
     # ボイスチャンネルにBOTを接続する
     @commands.command(enabled=is_enabled)
@@ -167,6 +179,13 @@ class music(commands.Cog):
         if self.voice.is_playing or self.voice.is_paused():
             return await ctx.send(f"'{self.playing_music}' が再生されています")
         await ctx.send('再生されている曲はありません')
+
+    @commands.command(name='queue', enabled=is_enabled)
+    async def queue_(self, ctx):
+        song_list = ''
+        for i, player in enumerate(self.songs._queue):
+            song_list += f"{i + 1}) {player.title}: {player.creater}\n"
+        await ctx.send(song_list)
 
     # 曲の停止
     @commands.command(enabled=is_enabled)

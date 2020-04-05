@@ -83,7 +83,7 @@ class music(commands.Cog):
 
         while self.voice.is_playing() or self.voice.is_paused():
             try:
-                react, _ = await self.bot.wait_for('reaction_add',check=check, timeout=30)
+                react, _ = await self.bot.wait_for('reaction_add',check=check, timeout=10)
             except asyncio.TimeoutError: continue
 
             if (emoji := str(react.emoji)) == "⏸" and not self.voice.is_paused():

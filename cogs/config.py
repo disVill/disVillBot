@@ -1,12 +1,12 @@
 import os
 
-BOT_TOKEN = ''
+BOT_TOKEN = 'NjI2NDAzNzAxNDY0MTA0OTk2.Xorgrw.rlnjxMkgMzuSEqe65SZNWZEV_n8'
 DAMMY_TOKEN = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken' # 偽トークン
-COMMAND_PREFIX = '!'
+COMMAND_PREFIX = '?'
 
 class SiteUrls:
     def __init__(self):
-        self._github_url = "https://github.com/disVill/disVillBot"
+        self._github_url = "https://github.com/disVill/DiscordBot"
         self._shinonome_twitter_url = "https://twitter.com/pgsus_info"
         self._wly_url = "https://wly.jp/"
 

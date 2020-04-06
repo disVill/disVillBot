@@ -60,7 +60,7 @@ class GuildId:
             'cogs.BotConfig',
             'cogs.PollSystem',
             'cogs.game',
-            'cogs.music',
+            # 'cogs.music',
             'cogs.help',
             'cogs.GoogleSearch',
             'cogs.wly',

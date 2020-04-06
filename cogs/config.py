@@ -1,8 +1,8 @@
 import os
 
-BOT_TOKEN = 'NjI2NDAzNzAxNDY0MTA0OTk2.Xorgrw.rlnjxMkgMzuSEqe65SZNWZEV_n8'
+BOT_TOKEN = ''
 DAMMY_TOKEN = 'Th1s1SD4MmYT0kEnS0Y0uC4n.N0tUS3Th1sT0K3n.pL34s3us3yourT0ken' # 偽トークン
-COMMAND_PREFIX = '?'
+COMMAND_PREFIX = '!'
 
 class SiteUrls:
     def __init__(self):

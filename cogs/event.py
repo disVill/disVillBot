@@ -28,11 +28,6 @@ class event(commands.Cog):
             await ctx.send(f'コマンド {ctx.message.content.split()[0]} は存在しません')
 
         elif isinstance(error, commands.CommandInvokeError):
-            original = error.original
-            if not isinstance(original, discord.HTTPException):
-                print(f'In {ctx.command.qualified_name}:', file=sys.stderr)
-                traceback.print_tb(original.__traceback__)
-                print(f'{original.__class__.__name__}: {original}', file=sys.stderr)
             await ctx.send('コマンドの実行に失敗しました')
 
         elif isinstance(error, commands.ArgumentParsingError):
@@ -44,9 +39,12 @@ class event(commands.Cog):
         elif isinstance(error, commands.UserInputError):
             await ctx.send('入力されたコマンドに誤りがあります')
 
-        print(f'Failed to invoke command', file=sys.stderr)
-        traceback.print_exc()
-        print('-' * 30)
+        try:
+            original = error.original
+            print(f'In {ctx.command.qualified_name}:', file=sys.stderr)
+            traceback.print_tb(original.__traceback__)
+            print(f'{original.__class__.__name__}: {original}', file=sys.stderr)
+        except AttributeError: ...
 
     # 新しいユーザが入ってきたら通知
     @commands.Cog.listener()

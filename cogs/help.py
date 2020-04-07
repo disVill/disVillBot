@@ -26,7 +26,7 @@ class BotHelp(commands.Cog):
             ("wly", "ワークラボの予約時間を表示します"),
             ("summon", "自分の入っているボイスチャンネルにBOTを呼び出します"),
             ("play [music name or YouTube URL]", "曲名かYouTubeのURLを指定するとその曲を再生します"),
-            ("queue", "キューに登録されている曲を表示します")
+            ("queue", "キューに登録されている曲を表示します"),
             ("pause", "曲を一時停止します"),
             ("playing", "再生中の曲名を表示します"),
             ("resume", "曲の再生を再開します"),

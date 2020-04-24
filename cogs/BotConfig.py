@@ -94,7 +94,8 @@ class config(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def activity_init(self, ctx):
         activity = discord.Activity()
-        await self.bot.change_presence(status=discord.Status.online, activity=activity)
+        status = discord.Status.online
+        await self.bot.change_presence(status=status, activity=activity)
 
     # change bot's activity
     @commands.command()

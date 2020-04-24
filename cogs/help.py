@@ -10,6 +10,7 @@ class BotHelp(commands.Cog):
         self.cmd_list = (
             ("avatar ([user name])", "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します"),
             ("echo [message]", "メッセージのオウム返しをします"),
+            ("cat", "入力を出力へコピーします"),
             ("emoji *[Custom-Emoji's name]", "BOTが指定したカスタム絵文字をリアクションします"),
             ("eval [python code]", "簡単なPythonのコードを実行します\n一部の組み込み関数のみ使用可能です"),
             ("google *[keyword]", 'googleで検索します'),
@@ -71,9 +72,9 @@ class BotHelp(commands.Cog):
         except discord.HTTPException: ...
 
     async def send_cmd_li(self, ctx, cmd_list):
-        per_page = 4
-        page = 1
-        max_page = len(cmd_list) // per_page + 1 if len(cmd_list) % per_page else 0
+        per_page, page = 4, 1
+        max_page = len(cmd_list) // per_page
+        max_page += 1 if len(cmd_list) % per_page else 0
         msg = await ctx.send(embed=self.get_help_embed(page, per_page, cmd_list))
         if max_page <= 1:
             return

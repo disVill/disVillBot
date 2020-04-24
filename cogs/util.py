@@ -113,6 +113,22 @@ class util(commands.Cog):
         await ctx.send(fin_txt)
 
     @commands.command()
+    async def cat(self, ctx, *option):
+        while True:
+            def check(m):
+                return m.author.id == ctx.author.id
+            try:
+                msg = await self.bot.wait_for("message", check=check, timeout=60)
+            except asyncio.TimeoutError:
+                break
+
+            await ctx.send(msg.content)
+
+    @commands.command()
+    async def seq(self, ctx, *, option):
+        ...
+
+    @commands.command()
     async def time(self, ctx):
         time_now = datetime.now(timezone(timedelta(hours=9)))
         await ctx.send(time_now)

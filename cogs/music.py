@@ -10,7 +10,7 @@ import youtube_dl
 from discord import Embed
 from discord.ext import commands
 
-from .manage import is_developer
+from cogs.manage import is_developer
 from cogs.config import GuildId
 
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -37,7 +37,7 @@ ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
 class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.3):
+    def __init__(self, source, chID, *, data, volume=0.3):
         super().__init__(source, volume)
 
         self.data = data
@@ -46,9 +46,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.url = data.get('url')
         self.duration = data.get('duration')
         self.creator = data.get('creator')
+        self.chID = chID
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
+    async def from_url(cls, url, chID, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
@@ -56,7 +57,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), data=data)
+        return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), chID, data=data)
 
 class music(commands.Cog):
     def __init__(self, bot):
@@ -66,7 +67,6 @@ class music(commands.Cog):
         self.play_next = asyncio.Event()
         self.songs = asyncio.Queue()
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-        self.bot_ch_id = GuildId().id_list['channel']['bot2']
 
     async def add_react(self, msg: object) -> None:
         try:
@@ -109,8 +109,6 @@ class music(commands.Cog):
         while not self.bot.is_closed():
             self.play_next.clear()
 
-            bot_ch = self.bot.get_channel(id=self.bot_ch_id)
-
             player = await self.songs.get()
             self.voice.play(player, after=self.toggle_next)
             self.playing_music = player.title
@@ -120,7 +118,9 @@ class music(commands.Cog):
                 color=0x00bfff,
                 description=f"{player.title}"
             )
-            msg = await bot_ch.send(embed=embed)
+
+            ch = self.bot.get_channel(id=player.chID)
+            msg = await ch.send(embed=embed)
             await self.m_player(msg)
 
             await self.play_next.wait()
@@ -137,7 +137,7 @@ class music(commands.Cog):
             url = googlesearch.search(url, lang='jp', num=1, tpe='vid').__next__()
 
         try:
-            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            player = await YTDLSource.from_url(url, chID=ctx.channel.id, loop=self.bot.loop)
         except Exception as e:
             return await ctx.send("曲のダウンロードに失敗しました")
             print(f'Failed to download music', file=sys.stderr)

@@ -15,16 +15,16 @@ class SusClasses(commands.Cog):
             json_load = json.load(f)
 
             for k, v in json_load.items():
-                if name in k:
+                if name in k.upper():
                     return_dict[k] = v
 
             return return_dict
 
-    @commands.command(name='class')
-    async def class_(self, ctx, name):
+    @commands.command(name='class', aliases=['cls'])
+    async def class_(self, ctx, *, name):
         class_dict = self.search_class(name.upper())
         if not class_dict:
-            await ctx.send("> 授業が見つかりませんでした")
+            await ctx.send(">>> 授業が見つかりませんでした\n追加してほしい授業あったら言って")
             return
 
         embed = Embed(
@@ -33,7 +33,7 @@ class SusClasses(commands.Cog):
             color=0x008000,
         )
 
-        fmt = "教員名　：`{}`\n曜日時限：`{}`\n授業番号：`{}`\n[SORA](https://sus.mrooms.net/course/view.php?id={})"
+        fmt = "教員名　：`{}`\n曜日時限：`{}`\n授業番号：`{}`\n[SOLA](https://sus.mrooms.net/course/view.php?id={})"
 
         for name, v in class_dict.items():
             embed.add_field(

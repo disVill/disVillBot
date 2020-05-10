@@ -120,9 +120,9 @@ class config(commands.Cog):
         if Option != '-q':
             def check(m: object) -> bool:
                 return m.channel.id == ctx.channel.id and m.author.id == ctx.author.id
-            await ctx.send('シャットダウンします\n続行するには [y] を送信してください')
+            await ctx.send('シャットダウンしますか？ (y/N)')
             msg = await self.bot.wait_for('message', check=check)
-            if not (msg.content in ['y', 'Y']):
+            if not (msg.content == 'y'):
                 return
 
         await ctx.send('ﾉｼ')

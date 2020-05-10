@@ -65,6 +65,7 @@ class GuildId:
             'cogs.GoogleSearch',
             'cogs.wly',
             'cogs.event',
+            'cogs.classes',
         )
         self._keycap_list = (
             "1\N{combining enclosing keycap}",

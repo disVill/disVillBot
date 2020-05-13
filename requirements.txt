@@ -1,7 +1,5 @@
-discord.py[voice] == 1.2.5
+discord.py[voice]
 google
 googletrans
 pyNaCl
 youtube_dl
-# matplotlib
-# numpy

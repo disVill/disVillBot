@@ -1,6 +1,8 @@
+import asyncio
 import random
 
 import discord
+from discord import Embed
 from discord.ext import commands
 
 class Game(commands.Cog):
@@ -26,7 +28,7 @@ class Game(commands.Cog):
 
     # janken game command
     @commands.command()
-    async def janken(self, ctx, *hand):
+    async def janken(self, ctx, hand):
         if hand not in ('rock', 'scissors', 'paper'):
             return await ctx.send("引数に'rock, scissors, paper'のどれかを入れてね")
 

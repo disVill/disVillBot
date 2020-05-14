@@ -10,17 +10,16 @@ class BotHelp(commands.Cog):
         self.cmd_list = (
             ("avatar ([user name])", "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します"),
             ("echo [message]", "メッセージのオウム返しをします"),
-            ("cat", "入力を出力へコピーします"),
+            # ("cat", "入力を出力へコピーします"),
             ("emoji *[Custom-Emoji's name]", "BOTが指定したカスタム絵文字をリアクションします"),
-            ("eval [python code]", "簡単なPythonのコードを実行します\n一部の組み込み関数のみ使用可能です"),
             ("google *[keyword]", 'googleで検索します'),
             ("help ([command name])", "コマンドのリストを表示します。\n名前を指定するとそのコマンドを表示します"),
             ("janken [hand type]", "BOTとじゃんけんします"),
-            ("menber", "このサーバにいるメンバーの合計数を表示します"),
+            ("member", "このサーバにいるメンバーの合計数を表示します"),
             ("ng [x] [z]", "minecraftのオープンワールド座標をネザーの座標に変換します"),
             ("latency", "Discord WebSocketプロトコル遅延を計測してミリ秒単位で表示します"),
-            ("poll [question] *[choices] lt 10", "アンケートを作成します"),
-            ("pf [number]", "素因数分解します (1 < number ≤ 65535)"),
+            ("poll [question] *[choices]", "アンケートを作成します"),
+            # ("pf [number]", "素因数分解します (1 < number ≤ 65535)"),
             ("roles", "自分についている役職を確認します"),
             ("time", "日本標準時間を表示します"),
             ("timer [time] ([label])", "タイマーを設定します\nラベルを入れると通知と一緒に表示します"),
@@ -34,9 +33,10 @@ class BotHelp(commands.Cog):
             ("stop", "曲の再生を停止します"),
             ("exit", "BOTを今いるボイスチャンネルから切断します"),
         )
-        self.cmd_with_perm_list = (
+        self.cmd_with_permission_list = (
             ("activity_init", "Botのアクティビティを初期化します"),
             ("activity [activity name]", "Botのアクティビティを変更します"),
+            ("eval [python code]", "簡単なPythonのコードを実行します\n一部の組み込み関数のみ使用可能です"),
             ("eval_ [formula]", "式を評価して結果を返します"),
             ("exec_ [sentence]", "文を実行します"),
             ("load [cog name]", "指定したcogをロードします"),
@@ -81,8 +81,9 @@ class BotHelp(commands.Cog):
         await self.add_react(msg, max_page)
 
         def react_check(r: object, u: object) -> bool:
-            if r.message.id == msg.id:
-                return str(r.emoji) in ("⏪", "◀", "▶", "⏩") and u.id == ctx.author.id
+            if u.bot or r.message.id != msg.id:
+                return
+            return str(r.emoji) in ("⏪", "◀", "▶", "⏩") and u.id == ctx.author.id
 
         while not self.bot.is_closed():
             try:
@@ -103,8 +104,8 @@ class BotHelp(commands.Cog):
 
     def find_cmd_by_name(self, cmd_names: str) -> int:
         send_cmd_list = []
-        for cmd in self.cmd_list + self.cmd_with_perm_list:
-            if cmd[0].startswith(cmd_names):
+        for cmd in self.cmd_list + self.cmd_with_permission_list:
+            if cmd_names in cmd[0]:
                 send_cmd_list.append(cmd)
 
         return send_cmd_list

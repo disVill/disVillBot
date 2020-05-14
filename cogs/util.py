@@ -14,7 +14,6 @@ from discord import Embed
 from discord.ext import commands
 
 from cogs.config import SiteUrls
-from cogs.manage import is_developer
 
 class util(commands.Cog):
     def __init__(self, bot):
@@ -41,6 +40,7 @@ class util(commands.Cog):
 
     # count member
     @commands.command()
+    @commands.guild_only()
     async def member(self, ctx):
         arg  = ctx.guild.member_count
         text = f'このサーバーには{arg}人のメンバーがいます'
@@ -48,6 +48,7 @@ class util(commands.Cog):
 
     # react custom emoji
     @commands.command()
+    @commands.guild_only()
     async def emoji(self, ctx, *emoji_names: str):
         if not emoji_names:
             await ctx.send('Custom Emojiの名前を入力してください')
@@ -58,6 +59,7 @@ class util(commands.Cog):
                 await ctx.message.add_reaction(emoji)
 
     @commands.command(aliases=['role'])
+    @commands.guild_only()
     async def roles(self, ctx):
         roles = [r.name for r in ctx.author.roles]
         await ctx.send(' '.join(roles[1:]))
@@ -149,6 +151,7 @@ class util(commands.Cog):
     async def github(self, ctx):
         await ctx.send(SiteUrls().github_url)
 
+    @commands.has_permissions(administrator=True)
     @commands.command(pass_context=True, name='eval')
     async def eval_(self, ctx, *, body: str):
         env = {

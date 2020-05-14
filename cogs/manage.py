@@ -1,20 +1,8 @@
-import asyncio
 import copy
-import sys
 
 import discord
 from discord import Embed
 from discord.ext import commands
-
-from cogs.config import GuildId
-
-def is_developer():
-    """コマンドの実行者が開発者か確認する"""
-    async def predicate(ctx):
-        if ctx.author.id == GuildId().id_list['user']['develop']:
-            return True
-        await ctx.send("実行する権限がありません")
-    return commands.check(predicate)
 
 class manage(commands.Cog):
     """discordサーバの管理系コマンド"""
@@ -23,19 +11,19 @@ class manage(commands.Cog):
 
     # change channel name
     @commands.command()
-    @is_developer()
+    @commands.has_permissions(manage_channels=True)
     async def name(self, ctx, *, channel_name: str):
         await ctx.channel.edit(name=channel_name)
 
     # change channel topic
     @commands.command()
-    @is_developer()
+    @commands.has_permissions(manage_channels=True)
     async def topic(self, ctx, *, channel_topic: str):
         await ctx.channel.edit(topic=channel_topic)
 
     # make new channel
-    @commands.command()
-    @is_developer()
+    @commands.command(aliases=['make_channel'])
+    @commands.has_permissions(manage_channels=True)
     async def mkch(self, ctx, *, ch_name):
         category_id = ctx.channel.category_id
         category = ctx.guild.get_channel(category_id)
@@ -44,20 +32,21 @@ class manage(commands.Cog):
 
     # eval
     @commands.command(name='eval_')
-    @is_developer()
+    @commands.has_permissions(administrator=True)
     async def evaluate(self, ctx, *, args: str):
         res = eval(args)
         await ctx.send(res)
 
     # exec
     @commands.command(name='exec_')
-    @is_developer()
+    @commands.has_permissions(administrator=True)
     async def execute(self, ctx, *, args: str):
         exec(args)
 
     # コマンドを別のユーザとして実行
     @commands.command(hidden=True)
-    @is_developer()
+    @commands.has_permissions(administrator=True)
+    @commands.guild_only()
     async def sudo(self, ctx, who: discord.User, *, command: str):
         channel = ctx.channel
         msg = copy.copy(ctx.message)

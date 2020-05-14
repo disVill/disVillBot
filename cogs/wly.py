@@ -1,17 +1,13 @@
-import datetime
+from datetime import datetime, timezone, timedelta
 
 import discord
 from discord import Embed
 from discord.ext import commands, tasks
 
-from cogs.config import GuildId, SiteUrls
-
-ID = GuildId().id_list
-
 class WorkLabYatsugatake(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.notice_loop.start()
+        # self.notice_loop.start()
         self.wly_book_list = {
             # '00/00': '00/00() 00:00-00:00',
         }
@@ -28,14 +24,14 @@ class WorkLabYatsugatake(commands.Cog):
         )
         return  embed
 
-    @tasks.loop(hours=1)
-    async def notice_loop(self):
-        now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%m/%d/%H')
+    # @tasks.loop(hours=1)
+    # async def notice_loop(self):
+    #     now = datetime.now(timezone(timedelta(hours=9))).strftime('%m/%d/%H')
 
-        for day, time in self.wly_book_list.items():
-            if now == day + '/08':
-                channel = self.bot.get_channel(id=ID['channel']['chat'])
-                await channel.send(f'@everyone\n今日はワークラボの予約日です\n{time.split().pop(1)}')
+    #     for day, time in self.wly_book_list.items():
+    #         if now == day + '/08':
+    #             channel = self.bot.get_channel(id=ID['channel']['chat'])
+    #             await channel.send(f'@everyone\n今日はワークラボの予約日です\n{time.split().pop(1)}')
 
     @commands.command()
     async def wly(self, ctx, *args):

@@ -33,10 +33,7 @@ class disVillBot(commands.Bot):
                 print(f'finished: {extension}')
                 print('-' * 30)
 
-        channel_id = GuildId().id_list['channel']['bot']
-        channel = self.get_channel(id=channel_id)
         text = 'start-up at: {}'.format(datetime.now(timezone(timedelta(hours=9))))
-        await channel.send(text)
         print(text)
         print('-' * 30)
 

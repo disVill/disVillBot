@@ -52,7 +52,8 @@ class PollEmbed(object):
 
         def react_check(r: object, u: object) -> bool:
             if r.message.id == msg.id and not u.bot:
-                return (emoji := str(r.emoji)) in KEYCAP or emoji == "🔚"
+                emoji = str(r.emoji)
+                return emoji in KEYCAP or emoji == "🔚"
 
         while not self.bot.is_closed():
             reaction, user = await self.bot.wait_for('reaction_add',check=react_check)

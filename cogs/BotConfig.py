@@ -9,9 +9,8 @@ from discord import Embed
 from discord.ext import commands
 
 from cogs.config import GuildId
-from cogs.manage import is_developer
 
-TOKEN, prefix = GuildId().get_token_and_prefix()
+TOKEN, _ = GuildId().get_token_and_prefix()
 
 class config(commands.Cog):
     """BOTの設定"""
@@ -54,7 +53,7 @@ class config(commands.Cog):
         await ctx.send('-' * 30)
 
     @commands.command()
-    @is_developer()
+    @commands.is_owner()
     async def reload(self, ctx, *extensions: str):
         channel  = ctx.channel
         author = ctx.author.id
@@ -81,17 +80,17 @@ class config(commands.Cog):
         await self.load_extensions(ctx, self.bot.reload_extension, ext_list)
 
     @commands.command()
-    @is_developer()
+    @commands.is_owner()
     async def load(self, ctx, *extensions: str):
         await self.load_extensions(ctx, self.bot.load_extension, extensions)
 
     @commands.command()
-    @is_developer()
+    @commands.is_owner()
     async def unload(self, ctx, *extensions: str):
         await self.load_extensions(ctx, self.bot.unload_extension, extensions, 'アンロード')
 
     @commands.command()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(manage_nicknames=True)
     async def activity_init(self, ctx):
         activity = discord.Activity()
         status = discord.Status.online
@@ -99,13 +98,13 @@ class config(commands.Cog):
 
     # change bot's activity
     @commands.command()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(manage_nicknames=True)
     async def activity(self, ctx, *, text: str):
         activity = discord.Activity(name=text, type=discord.ActivityType.watching)
         await self.bot.change_presence(status=discord.Status.online, activity=activity)
 
     @commands.command()
-    @is_developer()
+    @commands.is_owner()
     async def restart(self, ctx):
         await ctx.send('再起動します')
         [self.bot.unload_extension(e) for e in self.cog_list]
@@ -115,7 +114,7 @@ class config(commands.Cog):
         await self.bot.connect()
 
     @commands.command()
-    @is_developer()
+    @commands.is_owner()
     async def shutdown(self, ctx, Option: str=""):
         if Option != '-q':
             def check(m: object) -> bool:

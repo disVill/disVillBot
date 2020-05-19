@@ -34,9 +34,13 @@ ffmpeg_options = {
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
+# クラスの名前が思いつかない
 class SuperQueue(asyncio.Queue):
     def __init__(self, maxsize=0, *, loop=None):
         super().__init__(maxsize, loop=loop)
+
+    def clear(self):
+        self._queue.clear()
 
     def _put_left(self, item):
         self._queue.appendleft(item)
@@ -146,20 +150,27 @@ class music(commands.Cog):
         self.bot.loop.call_soon_threadsafe(self.play_next.set)
         print('error check:', error)
 
+    @commands.has_permissions(manage_messages=True)
     async def audio_player_task(self):
         while not self.bot.is_closed():
             self.play_next.clear()
 
             player = await self.songs.get()
-
-            self.voice.play(player, after=self.toggle_next)
+            try:
+                self.voice.play(player, after=self.toggle_next)
+            except Exception:
+                self.is_repeat = False
+                print("In audio_player_task\n", traceback.format_exc())
 
             self.playing_music = player.title
             embed = self.make_music_embed()
             channel = self.bot.get_channel(id=player.chID)
 
             msg = await channel.send(embed=embed)
-            await self.m_player(msg)
+            try:
+                await self.m_player(msg)
+            except Exception:
+                print("In music player", traceback.format_exc())
 
             if self.is_repeat:
                 await self.repeat_song(player.url, player.chID)
@@ -194,11 +205,13 @@ class music(commands.Cog):
     # YouTube-URLまたは曲名から曲を再生
     @commands.command(aliases=['p'], enabled=is_enabled)
     @commands.guild_only()
+    @commands.bot_has_permissions(manage_messages=True)
     async def play(self, ctx, *, url):
         await self.play_song(ctx, url)
 
     @commands.command()
     @commands.guild_only()
+    @commands.bot_has_permissions(manage_messages=True)
     async def stream(self, ctx, url: str):
         await self.play_song(ctx, url, stream=True)
 
@@ -248,6 +261,9 @@ class music(commands.Cog):
     @commands.command(name='queue', aliases=['q'], enabled=is_enabled)
     @commands.guild_only()
     async def queue_(self, ctx):
+        if self.voice is None:
+            return
+
         song_list = ""
         for i, p in enumerate(self.songs._queue):
             song_list += f"{i + 2}) {p.title[:40].ljust(40)}  {p.duration // 60:3}:{p.duration % 60:02}\n"
@@ -273,6 +289,12 @@ class music(commands.Cog):
 
     @commands.command(enabled=is_enabled)
     @commands.guild_only()
+    async def clear(self, ctx):
+        self.songs.clear()
+        await ctx.send("キューを空にしました")
+
+    @commands.command(enabled=is_enabled)
+    @commands.guild_only()
     async def repeat(self, ctx):
         self.toggle_repeat()
         await ctx.send("Repeat is {}enabled".format('' if self.is_repeat else 'dis'))
@@ -285,10 +307,19 @@ class music(commands.Cog):
         await self.voice.disconnect()
         self.voice = None
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def eval_m(self, ctx, *, form):
-        await ctx.send(eval(form))
+        try:
+            text = eval(form)
+        except Exception:
+            await ctx.send(f"```py\n{traceback.format_exc()}```")
+            return
+
+        if text:
+            await ctx.send(f"```py\n{text}```")
+        else:
+            await ctx.send('Done')
 
 def setup(bot):
     bot.add_cog(music(bot))

@@ -22,9 +22,6 @@ class event(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             await ctx.send(f'コマンド {ctx.message.content.split()[0]} は存在しません')
 
-        elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send('コマンドの実行に失敗しました')
-
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('コマンドの引数が足りません')
 
@@ -42,11 +39,14 @@ class event(commands.Cog):
                 f">>> コマンドを実行する権限が不足しています\n必要な権限: {', '.join(error.missing_perms)}"
             )
 
-        elif isinstance(error, commands.MissingPermissions):
+        elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send(f">>> BOTの権限が不足しています\n必要な権限: {', '.join(error.missing_perms)}")
 
         elif isinstance(error, commands.NotOwner):
             await ctx.send('BOT開発者専用のコマンドです')
+
+        elif isinstance(error, commands.CommandInvokeError):
+            await ctx.send('コマンドの実行に失敗しました')
 
         elif isinstance(error, commands.CheckFailure):
             await ctx.send('コマンドの実行チェックでエラーが発生しました')

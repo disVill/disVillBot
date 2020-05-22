@@ -59,7 +59,8 @@ class PollEmbed(object):
             reaction, user = await self.bot.wait_for('reaction_add',check=react_check)
             await msg.clear_reactions()
 
-            if (emoji := str(reaction.emoji)) == "🔚" and self.poll_author_id == user.id:
+            emoji = str(reaction.emoji)
+            if emoji == "🔚" and self.poll_author_id == user.id:
                 await msg.edit(embed=self.edit_embed(most_voter=True))
                 break
             if not user.id in self.voted:

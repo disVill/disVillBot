@@ -104,6 +104,21 @@ class config(commands.Cog):
         await self.bot.change_presence(status=discord.Status.online, activity=activity)
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def chprefix(self, ctx, *new_prefix):
+        if not new_prefix:
+            raise commands.UserInputError()
+        
+        try:
+            self.bot.command_prefix = new_prefix
+        except Exception:
+            print('In change prefix\n', traceback.format_exc())
+            return
+
+
+        await ctx.send(f"prefixを {' '.join(new_prefix)} に設定しました")
+
+    @commands.command()
     @commands.is_owner()
     async def restart(self, ctx):
         await ctx.send('再起動します')

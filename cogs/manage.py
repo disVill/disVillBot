@@ -32,14 +32,14 @@ class manage(commands.Cog):
 
     # eval
     @commands.command(name='eval_')
-    @commands.has_permissions(administrator=True)
+    @commands.is_owner()
     async def evaluate(self, ctx, *, args: str):
         res = eval(args)
         await ctx.send(res)
 
     # exec
     @commands.command(name='exec_')
-    @commands.has_permissions(administrator=True)
+    @commands.is_owner()
     async def execute(self, ctx, *, args: str):
         exec(args)
 

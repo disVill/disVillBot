@@ -91,7 +91,8 @@ class BotHelp(commands.Cog):
             except asyncio.TimeoutError:
                 return await msg.clear_reactions()
 
-            if (emoji := str(reaction.emoji)) == "▶" and page < max_page:
+            emoji = str(reaction.emoji)
+            if emoji  == "▶" and page < max_page:
                 page += 1
             if emoji == "◀" and page > 1:
                 page -= 1

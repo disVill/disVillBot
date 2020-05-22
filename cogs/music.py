@@ -219,8 +219,8 @@ class music(commands.Cog):
     @commands.command(enabled=is_enabled)
     @commands.guild_only()
     async def summon(self, ctx):
-        if not discord.opus.is_loaded():
-            discord.opus.load_opus("heroku-buildpack-libopus")
+        # if not discord.opus.is_loaded():
+        #     discord.opus.load_opus("heroku-buildpack-libopus")
 
         await ctx.send('ボイスチャンネルへ接続します')
 
@@ -308,7 +308,7 @@ class music(commands.Cog):
         self.voice = None
 
     @commands.command(hidden=True)
-    @commands.has_permissions(administrator=True)
+    @commands.is_owner()
     async def eval_m(self, ctx, *, form):
         try:
             text = eval(form)

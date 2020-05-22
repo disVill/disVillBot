@@ -20,7 +20,7 @@ class SusClasses(commands.Cog):
 
             return return_dict
 
-    @commands.command(name='class', aliases=['cls'])
+    @commands.command(name='class', aliases=['cls'], enabled=True)
     async def class_(self, ctx, *, name):
         class_dict = self.search_class(name.upper())
         if not class_dict:

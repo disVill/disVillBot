@@ -10,16 +10,13 @@ class BotHelp(commands.Cog):
         self.cmd_list = (
             ("avatar ([user name])", "アバター画像を表示します. 名前を指定するとそのユーザの画像を表示します"),
             ("echo [message]", "メッセージのオウム返しをします"),
-            # ("cat", "入力を出力へコピーします"),
             ("emoji *[Custom-Emoji's name]", "BOTが指定したカスタム絵文字をリアクションします"),
             ("google *[keyword]", 'googleで検索します'),
             ("help ([command name])", "コマンドのリストを表示します。\n名前を指定するとそのコマンドを表示します"),
             ("janken [hand type]", "BOTとじゃんけんします"),
             ("member", "このサーバにいるメンバーの合計数を表示します"),
-            ("ng [x] [z]", "minecraftのオープンワールド座標をネザーの座標に変換します"),
             ("latency", "Discord WebSocketプロトコル遅延を計測してミリ秒単位で表示します"),
             ("poll [question] *[choices]", "アンケートを作成します"),
-            # ("pf [number]", "素因数分解します (1 < number ≤ 65535)"),
             ("roles", "自分についている役職を確認します"),
             ("time", "日本標準時間を表示します"),
             ("timer [time] ([label])", "タイマーを設定します\nラベルを入れると通知と一緒に表示します"),
@@ -36,6 +33,7 @@ class BotHelp(commands.Cog):
         self.cmd_with_permission_list = (
             ("activity_init", "Botのアクティビティを初期化します"),
             ("activity [activity name]", "Botのアクティビティを変更します"),
+            ("chprefix", "BOTのprefixを変更します"
             ("eval [python code]", "簡単なPythonのコードを実行します\n一部の組み込み関数のみ使用可能です"),
             ("eval_ [formula]", "式を評価して結果を返します"),
             ("exec_ [sentence]", "文を実行します"),

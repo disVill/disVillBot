@@ -1,7 +1,7 @@
 import os
 
-BOT_TOKEN = ''
-COMMAND_PREFIX = '!'
+BOT_TOKEN = 'NjI2NDAzNzAxNDY0MTA0OTk2.XsSpOg.nQ0l2KbEwd3pfM7x65sPPBT-u34'
+COMMAND_PREFIX = '?'
 token_path = 'TOKEN'
 
 class TokenNotFound(Exception):
@@ -9,7 +9,7 @@ class TokenNotFound(Exception):
 
 class SiteUrls:
     def __init__(self):
-        self._github_url = "https://github.com/disVill/DiscordBot"
+        self._github_url = "https://github.com/disVill/disVillBot"
         self._shinonome_twitter_url = "https://twitter.com/pgsus_info"
         self._wly_url = "https://wly.jp/"
 

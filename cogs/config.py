@@ -1,6 +1,6 @@
 import os
 
-BOT_TOKEN = 'NjI2NDAzNzAxNDY0MTA0OTk2.XsSpOg.nQ0l2KbEwd3pfM7x65sPPBT-u34'
+BOT_TOKEN = ''
 COMMAND_PREFIX = '?'
 token_path = 'TOKEN'
 

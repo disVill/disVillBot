@@ -72,7 +72,10 @@ class event(commands.Cog):
 
         if guild.system_channel is not None:
             to_send = '{0.mention}{1.name}へようこそ\nあなたは{1.member_count}人目のメンバーです'.format(member, guild)
-            await guild.system_channel.send(to_send)
+            try:
+                await guild.system_channel.send(to_send)
+            except commands.BotMissingPermissions:
+                pass
 
         if member_role is not None:
             try:

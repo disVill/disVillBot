@@ -33,7 +33,7 @@ class BotHelp(commands.Cog):
         self.cmd_with_permission_list = (
             ("activity_init", "Botのアクティビティを初期化します"),
             ("activity [activity name]", "Botのアクティビティを変更します"),
-            ("chprefix", "BOTのprefixを変更します"
+            ("chprefix", "BOTのprefixを変更します"),
             ("eval [python code]", "簡単なPythonのコードを実行します\n一部の組み込み関数のみ使用可能です"),
             ("eval_ [formula]", "式を評価して結果を返します"),
             ("exec_ [sentence]", "文を実行します"),
@@ -90,7 +90,8 @@ class BotHelp(commands.Cog):
                 return await msg.clear_reactions()
 
             emoji = str(reaction.emoji)
-            if emoji  == "▶" and page < max_page:
+
+            if emoji == "▶" and page < max_page:
                 page += 1
             if emoji == "◀" and page > 1:
                 page -= 1

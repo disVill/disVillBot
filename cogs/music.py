@@ -24,7 +24,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'source_address': '0.0.0.0'
 }
 
 ffmpeg_options = {
@@ -116,7 +116,7 @@ class music(commands.Cog):
 
         while self.voice.is_playing() or self.voice.is_paused():
             try:
-                react, _ = await self.bot.wait_for('reaction_add',check=check, timeout=10)
+                react, _ = await self.bot.wait_for('reaction_add', check=check, timeout=10)
             except asyncio.TimeoutError:
                 continue
 
@@ -178,9 +178,14 @@ class music(commands.Cog):
             await self.play_next.wait()
 
     async def play_song(self, ctx, url, stream=False):
+        if self.songs.qsize() >= 20:
+            await ctx.send("追加できる曲数の上限に達しています")
+            return
+
         if (self.voice is None) or (not self.voice.is_connected()):
             if ctx.author.voice is None:
-                return await ctx.send('ボイスチャンネルに接続してください')
+                await ctx.send('ボイスチャンネルに接続してください')
+                return
             await ctx.invoke(self.summon)
 
         if not (url.startswith("https://www.youtube.com/") and url.startswith('https://youtu.be/')):
@@ -219,6 +224,7 @@ class music(commands.Cog):
     @commands.command(enabled=is_enabled)
     @commands.guild_only()
     async def summon(self, ctx):
+        # herokuでデプロイするとき用
         # if not discord.opus.is_loaded():
         #     discord.opus.load_opus("heroku-buildpack-libopus")
 
@@ -234,7 +240,6 @@ class music(commands.Cog):
 
     # 曲の一時停止
     @commands.command(enabled=is_enabled)
-    @commands.guild_only()
     async def pause(self, ctx):
         if self.voice.is_playing():
             return self.voice.pause()
@@ -242,7 +247,6 @@ class music(commands.Cog):
 
     # 曲の一時停止を解除
     @commands.command(enabled=is_enabled)
-    @commands.guild_only()
     async def resume(self, ctx):
         if self.voice.is_paused():
             return self.voice.resume()
@@ -281,7 +285,6 @@ class music(commands.Cog):
 
     # 曲の停止
     @commands.command(enabled=is_enabled)
-    @commands.guild_only()
     async def stop(self, ctx):
         if self.voice.is_playing():
             return self.voice.stop()
@@ -301,7 +304,6 @@ class music(commands.Cog):
 
     # ボイスチャンネルからBOTを退出
     @commands.command(enabled=is_enabled)
-    @commands.guild_only()
     async def exit(self, ctx):
         await ctx.send('ボイスチャンネルから切断します')
         await self.voice.disconnect()

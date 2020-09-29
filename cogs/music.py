@@ -34,8 +34,8 @@ ffmpeg_options = {
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 is_enabled = True
 
-# クラスの名前が思いつかない
-class SuperQueue(asyncio.Queue):
+
+class ExtendedQueue(asyncio.Queue):
     def __init__(self, maxsize=0, *, loop=None):
         super().__init__(maxsize, loop=loop)
 
@@ -78,13 +78,14 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(source=filename, **ffmpeg_options), chID, url, data=data)
 
+
 class music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.voice = None
         self.playing_music = ''
         self.play_next = asyncio.Event()
-        self.songs = SuperQueue()
+        self.songs = ExtendedQueue()
         self.is_repeat = False
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
 

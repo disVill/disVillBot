@@ -59,7 +59,7 @@ class config(commands.Cog):
         author = ctx.author.id
         ext_list = []
 
-        if not len(extensions):
+        if not extensions:
             embed = self.choice_extension()
             await ctx.send(embed=embed)
 
@@ -115,7 +115,6 @@ class config(commands.Cog):
             print('In change prefix\n', traceback.format_exc())
             return
 
-
         await ctx.send(f"prefixを {' '.join(new_prefix)} に設定しました")
 
     @commands.command()
@@ -130,8 +129,8 @@ class config(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def shutdown(self, ctx, Option: str=""):
-        if Option != '-q':
+    async def shutdown(self, ctx, option: str=""):
+        if option != '-q':
             def check(m: object) -> bool:
                 return m.channel.id == ctx.channel.id and m.author.id == ctx.author.id
             await ctx.send('シャットダウンしますか？ (y/N)')

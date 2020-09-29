@@ -38,8 +38,8 @@ class disVillBot(commands.Bot):
         print('-' * 30)
 
         activity = discord.Activity(
-            name='ご注文はうさぎですか？',
-            type=discord.ActivityType.watching,
+                name='ご注文はうさぎですか？',
+                type=discord.ActivityType.watching,
             )
         await self.change_presence(status=discord.Status.online, activity=activity)
 

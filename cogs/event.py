@@ -62,7 +62,8 @@ class event(commands.Cog):
             original = error.original
             traceback.print_tb(original.__traceback__)
             print(f'{original.__class__.__name__}: {original}', file=sys.stderr)
-        except AttributeError: ...
+        except AttributeError:
+            pass
 
     # 新しいユーザが入ってきたら通知
     @commands.Cog.listener()

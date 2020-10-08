@@ -15,7 +15,7 @@ class PollEmbed(object):
         self.embed = embed.copy()
         self.poll_author_id = author_id
         self.voted = []
-        self.votes = [0 for i in range(len(choices))]
+        self.votes = [0] * len(choices)
 
     @classmethod
     def mk_poll_embed(cls, bot: object, author: object, que: str, choices: tuple) -> classmethod:
@@ -27,7 +27,7 @@ class PollEmbed(object):
 
         return cls(bot, embed, author.id, choices)
 
-    def edit_embed(self, most_voter: bool=False) -> object:
+    def edit_embed(self, most_voter: bool = False) -> object:
         self.embed.clear_fields()
         max_votes = max(self.votes)
 
@@ -45,7 +45,8 @@ class PollEmbed(object):
         try:
             [await msg.add_reaction(r) for r in KEYCAP[:len(self.votes)]]
             await msg.add_reaction("🔚")
-        except discord.HTTPException: ...
+        except discord.HTTPException:
+            pass
 
     async def wait_poll(self, msg: object) -> None:
         await self.add_react(msg)
@@ -54,6 +55,7 @@ class PollEmbed(object):
             if r.message.id == msg.id and not u.bot:
                 emoji = str(r.emoji)
                 return emoji in KEYCAP or emoji == "🔚"
+            return False
 
         while not self.bot.is_closed():
             reaction, user = await self.bot.wait_for('reaction_add',check=react_check)
@@ -83,7 +85,8 @@ class Poll(commands.Cog):
     @commands.command()
     async def poll(self, ctx, que: str, *choices: str):
         if len(choices) > 9:
-            return await ctx.send("選択肢が多すぎます")
+            await ctx.send("選択肢が多すぎます")
+            return
         poll_cls = PollEmbed.mk_poll_embed(self.bot, ctx.author, que, choices)
         poll_msg = await ctx.send(embed=poll_cls.embed)
 

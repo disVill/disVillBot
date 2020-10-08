@@ -24,7 +24,7 @@ class disVillBot(commands.Bot):
             try:
                 self.load_extension(extension)
             except commands.ExtensionAlreadyLoaded:
-                ...
+                pass
             except:
                 print(f'Failed to load extension: {extension}.', file=sys.stderr)
                 traceback.print_exc()

@@ -301,7 +301,7 @@ class music(commands.Cog):
     @commands.guild_only()
     async def repeat(self, ctx):
         self.toggle_repeat()
-        await ctx.send("Repeat is {}enabled".format('' if self.is_repeat else 'dis'))
+        await ctx.send("リピート再生が{}になりました".format('オン' if self.is_repeat else 'オフ'))
 
     # ボイスチャンネルからBOTを退出
     @commands.command(enabled=is_enabled)
